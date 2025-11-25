@@ -1,7 +1,8 @@
 {
-  "name": "tauri-app",
+  "name": "oasis-write",
   "private": true,
   "version": "0.1.0",
+  "description": "A serene and focused markdown writing environment",
   "type": "module",
   "scripts": {
     "dev": "vite",
