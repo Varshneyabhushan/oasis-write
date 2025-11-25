@@ -11,17 +11,24 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "@lexical/code": "^0.38.2",
+    "@lexical/link": "^0.38.2",
+    "@lexical/list": "^0.38.2",
+    "@lexical/markdown": "^0.38.2",
+    "@lexical/react": "^0.38.2",
+    "@lexical/rich-text": "^0.38.2",
     "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-opener": "^2"
+    "@tauri-apps/plugin-opener": "^2",
+    "lexical": "^0.38.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4",
-    "@tauri-apps/cli": "^2"
+    "vite": "^7.0.4"
   }
 }
