@@ -11,6 +11,7 @@ function App() {
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string>("");
+  const [originalContent, setOriginalContent] = useState<string>("");
   const [isDirty, setIsDirty] = useState(false);
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -32,6 +33,7 @@ function App() {
     try {
       const content = await invoke<string>("read_file", { path });
       setFileContent(content);
+      setOriginalContent(content);
       setSelectedFile(path);
       setIsDirty(false);
     } catch (error) {
@@ -48,6 +50,7 @@ function App() {
         path: selectedFile,
         contents: fileContent,
       });
+      setOriginalContent(fileContent);
       setIsDirty(false);
       console.log("File saved successfully");
     } catch (error) {
@@ -72,19 +75,23 @@ function App() {
   // Handle content change in editor
   const handleContentChange = (content: string) => {
     setFileContent(content);
-    setIsDirty(true);
+    // Only mark as dirty if content actually changed from original
+    if (content !== originalContent) {
+      setIsDirty(true);
+    }
   };
 
-  // Auto-save on content change (debounced)
-  useEffect(() => {
-    if (!isDirty || !selectedFile) return;
+  // Disable auto-save to prevent content corruption from markdown conversion
+  // User must manually save with Cmd/Ctrl+S
+  // useEffect(() => {
+  //   if (!isDirty || !selectedFile) return;
 
-    const timer = setTimeout(() => {
-      saveFile();
-    }, 2000); // Auto-save after 2 seconds of inactivity
+  //   const timer = setTimeout(() => {
+  //     saveFile();
+  //   }, 2000);
 
-    return () => clearTimeout(timer);
-  }, [fileContent, isDirty, selectedFile, saveFile]);
+  //   return () => clearTimeout(timer);
+  // }, [fileContent, isDirty, selectedFile, saveFile]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -114,6 +121,7 @@ function App() {
   }
 
   const fileName = selectedFile ? selectedFile.split('/').pop() || 'Untitled.md' : 'Untitled.md';
+  const displayFileName = isDirty ? `${fileName} •` : fileName;
 
   return (
     <div className="app">
@@ -129,7 +137,7 @@ function App() {
       <Editor
         onToggleSidebar={toggleSidebar}
         onToggleZenMode={toggleZenMode}
-        fileName={fileName}
+        fileName={displayFileName}
         filePath={selectedFile || undefined}
         fileContent={selectedFile ? fileContent : undefined}
         onContentChange={handleContentChange}

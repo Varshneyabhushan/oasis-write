@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import MarkdownEditor from './MarkdownEditor';
+import TipTapEditor from './TipTapEditor';
 
 interface EditorProps {
   onToggleSidebar: () => void;
@@ -34,7 +34,7 @@ const Editor: FC<EditorProps> = ({
         </div>
       </header>
       <main className="editor-main">
-        <MarkdownEditor
+        <TipTapEditor
           key={filePath || 'empty'}
           initialContent={fileContent}
           onChange={onContentChange}

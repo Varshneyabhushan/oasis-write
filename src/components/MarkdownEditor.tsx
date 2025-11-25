@@ -119,8 +119,6 @@ const MarkdownEditor: FC<MarkdownEditorProps> = ({ initialContent, onChange }) =
     if (onChange) {
       editorState.read(() => {
         const markdown = $convertToMarkdownString(TRANSFORMERS);
-        // Debug: log to see what's being converted
-        console.log('Converted markdown:', markdown.substring(0, 200));
         onChange(markdown);
       });
     }
