@@ -130,6 +130,7 @@ function App() {
         onToggleSidebar={toggleSidebar}
         onToggleZenMode={toggleZenMode}
         fileName={fileName}
+        filePath={selectedFile || undefined}
         fileContent={selectedFile ? fileContent : undefined}
         onContentChange={handleContentChange}
       />

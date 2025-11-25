@@ -90,7 +90,9 @@ function InitialContentPlugin({ content }: { content?: string }) {
         $convertFromMarkdownString(content, TRANSFORMERS);
       });
     }
-  }, [editor, content]);
+    // Only run once on mount, not when content changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
 
   return null;
 }
@@ -117,6 +119,8 @@ const MarkdownEditor: FC<MarkdownEditorProps> = ({ initialContent, onChange }) =
     if (onChange) {
       editorState.read(() => {
         const markdown = $convertToMarkdownString(TRANSFORMERS);
+        // Debug: log to see what's being converted
+        console.log('Converted markdown:', markdown.substring(0, 200));
         onChange(markdown);
       });
     }

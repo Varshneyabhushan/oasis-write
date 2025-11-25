@@ -5,6 +5,7 @@ interface EditorProps {
   onToggleSidebar: () => void;
   onToggleZenMode: () => void;
   fileName?: string;
+  filePath?: string;
   fileContent?: string;
   onContentChange?: (content: string) => void;
 }
@@ -13,6 +14,7 @@ const Editor: FC<EditorProps> = ({
   onToggleSidebar,
   onToggleZenMode,
   fileName = 'Untitled.md',
+  filePath,
   fileContent,
   onContentChange
 }) => {
@@ -33,6 +35,7 @@ const Editor: FC<EditorProps> = ({
       </header>
       <main className="editor-main">
         <MarkdownEditor
+          key={filePath || 'empty'}
           initialContent={fileContent}
           onChange={onContentChange}
         />

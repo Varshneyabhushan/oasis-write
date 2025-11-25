@@ -110,6 +110,16 @@
   font-size: 14px;
   overflow-x: auto;
   line-height: 1.5;
+  display: block;
+  white-space: pre;
+  position: relative;
+  tab-size: 2;
+}
+
+.editor-code > code {
+  display: block;
+  white-space: pre;
+  font-family: inherit;
 }
 
 /* Inline code */
