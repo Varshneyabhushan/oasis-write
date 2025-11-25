@@ -21,9 +21,16 @@ This document outlines the core features planned for Oasis-write, guided by our 
 *   **Common Markdown Shortcuts:** Standard keyboard shortcuts for bold, italics, links, and other markdown elements to speed up your writing workflow.
 *   **Export Options:** Easily export your finished work to other formats, starting with HTML and PDF.
 
+## Rich Content & Markdown Extensions
+
+*   **Advanced Tables:** Full support for GitHub Flavored Markdown (GFM) tables, making it easy to organize data.
+*   **Diagrams as Code:** Create and render UML, flowchart, sequence, and other diagrams directly in your notes using **Mermaid.js** syntax.
+*   **Code Snippet Highlighting:** Beautiful, language-aware syntax highlighting for dozens of programming languages inside fenced code blocks.
+*   **Image Handling:** Full support for inline images from local or remote paths.
+
 ## Future Goals (Post v1.0)
 
 *   **Global Search:** A powerful search function to find text across all files within your opened folder.
 *   **Cloud Sync Integration:** An optional feature to connect a cloud storage provider (like iCloud, Google Drive, or Dropbox) for seamless file synchronization across your devices.
-*   **Expanded Theme Support:** The ability to create and share custom user-made themes. (may not needed)
-*   **Tabbed Editing:** Open multiple files in tabs for easy switching between documents. (may not needed)
+*   **Clipboard Image Pasting:** Paste images directly from your clipboard into the editor, automatically saving the file and inserting the link.
+*   **Tabbed Editing & Theming:** Potential future support for tabs and user-created themes will be considered based on user feedback to keep the core experience clean.
