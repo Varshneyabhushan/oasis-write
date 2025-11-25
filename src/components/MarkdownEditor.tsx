@@ -1,17 +1,18 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListNode, ListItemNode } from '@lexical/list';
 import { CodeNode, CodeHighlightNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
-import {
-  TRANSFORMERS,
-} from '@lexical/markdown';
+import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS } from '@lexical/markdown';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $getRoot, EditorState } from 'lexical';
 
 import './MarkdownEditor.css';
 
@@ -74,24 +75,53 @@ const theme = {
   link: 'editor-link',
 };
 
-const editorConfig = {
-  namespace: 'OasisWriteEditor',
-  theme,
-  onError(error: Error) {
-    console.error(error);
-  },
-  nodes: [
-    HeadingNode,
-    QuoteNode,
-    ListNode,
-    ListItemNode,
-    CodeNode,
-    CodeHighlightNode,
-    LinkNode,
-  ],
-};
+interface MarkdownEditorProps {
+  initialContent?: string;
+  onChange?: (content: string) => void;
+}
 
-const MarkdownEditor: FC = () => {
+// Plugin to load initial markdown content
+function InitialContentPlugin({ content }: { content?: string }) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (content) {
+      editor.update(() => {
+        $convertFromMarkdownString(content, TRANSFORMERS);
+      });
+    }
+  }, [editor, content]);
+
+  return null;
+}
+
+const MarkdownEditor: FC<MarkdownEditorProps> = ({ initialContent, onChange }) => {
+  const editorConfig = {
+    namespace: 'OasisWriteEditor',
+    theme,
+    onError(error: Error) {
+      console.error(error);
+    },
+    nodes: [
+      HeadingNode,
+      QuoteNode,
+      ListNode,
+      ListItemNode,
+      CodeNode,
+      CodeHighlightNode,
+      LinkNode,
+    ],
+  };
+
+  const handleChange = (editorState: EditorState) => {
+    if (onChange) {
+      editorState.read(() => {
+        const markdown = $convertToMarkdownString(TRANSFORMERS);
+        onChange(markdown);
+      });
+    }
+  };
+
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="markdown-editor-container">
@@ -106,6 +136,8 @@ const MarkdownEditor: FC = () => {
         />
         <HistoryPlugin />
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        <InitialContentPlugin content={initialContent} />
+        {onChange && <OnChangePlugin onChange={handleChange} />}
       </div>
     </LexicalComposer>
   );

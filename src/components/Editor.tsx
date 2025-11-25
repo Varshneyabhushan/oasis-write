@@ -4,14 +4,23 @@ import MarkdownEditor from './MarkdownEditor';
 interface EditorProps {
   onToggleSidebar: () => void;
   onToggleZenMode: () => void;
+  fileName?: string;
+  fileContent?: string;
+  onContentChange?: (content: string) => void;
 }
 
-const Editor: FC<EditorProps> = ({ onToggleSidebar, onToggleZenMode }) => {
+const Editor: FC<EditorProps> = ({
+  onToggleSidebar,
+  onToggleZenMode,
+  fileName = 'Untitled.md',
+  fileContent,
+  onContentChange
+}) => {
   return (
     <div className="editor-container">
       <header className="editor-header">
         <div className="editor-title">
-          Untitled.md
+          {fileName}
         </div>
         <div className="editor-actions">
           <button onClick={onToggleSidebar}>
@@ -23,7 +32,10 @@ const Editor: FC<EditorProps> = ({ onToggleSidebar, onToggleZenMode }) => {
         </div>
       </header>
       <main className="editor-main">
-        <MarkdownEditor />
+        <MarkdownEditor
+          initialContent={fileContent}
+          onChange={onContentChange}
+        />
       </main>
     </div>
   );
