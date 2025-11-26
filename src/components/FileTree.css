@@ -25,22 +25,25 @@
 }
 
 .file-tree-arrow {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 16px;
+  height: 16px;
   font-size: 10px;
   transition: transform 0.2s;
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .file-tree-arrow.expanded {
   transform: rotate(90deg);
 }
 
-.file-tree-icon {
+.file-tree-spacer {
   display: inline-block;
   width: 16px;
-  font-size: 12px;
-  margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .file-tree-name {

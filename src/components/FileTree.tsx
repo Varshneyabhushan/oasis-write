@@ -22,7 +22,7 @@ interface FileTreeItemProps {
 }
 
 const FileTreeItem: FC<FileTreeItemProps> = ({ entry, onFileSelect, selectedPath, depth }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const isSelected = selectedPath === entry.path;
 
   const handleClick = () => {
@@ -40,12 +40,13 @@ const FileTreeItem: FC<FileTreeItemProps> = ({ entry, onFileSelect, selectedPath
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
         onClick={handleClick}
       >
-        {entry.is_directory && (
+        {entry.is_directory ? (
           <span className={`file-tree-arrow ${isExpanded ? 'expanded' : ''}`}>
             ▶
           </span>
+        ) : (
+          <span className="file-tree-spacer"></span>
         )}
-        {!entry.is_directory && <span className="file-tree-icon">📄</span>}
         <span className="file-tree-name">{entry.name}</span>
       </div>
 
