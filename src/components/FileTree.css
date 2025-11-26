@@ -3,16 +3,16 @@
 }
 
 .file-tree-item {
-  font-size: 13px;
+  font-size: 0.9375rem;
   font-weight: 600;
 }
 
 .file-tree-row {
   display: flex;
   align-items: center;
-  padding: 6px 8px;
+  padding: 0.375rem 0.5rem;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: 0.1875rem;
   transition: background-color 0.2s;
   color: var(--text-primary);
 }
@@ -31,9 +31,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  font-size: 10px;
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.625rem;
   transition: transform 0.2s;
   color: var(--text-secondary);
   flex-shrink: 0;
@@ -45,7 +45,7 @@
 
 .file-tree-spacer {
   display: inline-block;
-  width: 16px;
+  width: 1rem;
   flex-shrink: 0;
 }
 
