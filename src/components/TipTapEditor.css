@@ -75,6 +75,10 @@
   padding-left: 1.5em;
 }
 
+.tiptap-editor ol {
+  padding-left: 2.5em;
+}
+
 .tiptap-editor li {
   margin: 0;
   line-height: 1.5;
