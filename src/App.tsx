@@ -15,6 +15,16 @@ function App() {
   const [isDirty, setIsDirty] = useState(false);
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [fontSize, setFontSize] = useState(16); // Default font size in pixels
+
+  // Font size adjustment handlers
+  const increaseFontSize = useCallback(() => {
+    setFontSize(prev => Math.min(prev + 2, 32)); // Max 32px
+  }, []);
+
+  const decreaseFontSize = useCallback(() => {
+    setFontSize(prev => Math.max(prev - 2, 10)); // Min 10px
+  }, []);
 
   // Load folder contents
   const loadFolder = useCallback(async (path: string) => {
@@ -95,6 +105,8 @@ function App() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      console.log('Key pressed:', e.key, 'metaKey:', e.metaKey, 'ctrlKey:', e.ctrlKey);
+
       // Cmd/Ctrl + S to save
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
         e.preventDefault();
@@ -110,11 +122,27 @@ function App() {
         e.preventDefault();
         setSidebarVisible(!sidebarVisible);
       }
+      // Cmd/Ctrl + = or Cmd/Ctrl + + to increase font size
+      if ((e.metaKey || e.ctrlKey) && (e.key === '=' || e.key === '+')) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Increasing font size');
+        increaseFontSize();
+        return false;
+      }
+      // Cmd/Ctrl + - to decrease font size
+      if ((e.metaKey || e.ctrlKey) && e.key === '-') {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Decreasing font size');
+        decreaseFontSize();
+        return false;
+      }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [saveFile, sidebarVisible]);
+    document.addEventListener('keydown', handleKeyDown, { capture: true });
+    return () => document.removeEventListener('keydown', handleKeyDown, { capture: true });
+  }, [saveFile, sidebarVisible, increaseFontSize, decreaseFontSize]);
 
   // Show welcome screen if no folder is opened
   if (!folderPath) {
@@ -134,6 +162,7 @@ function App() {
         filePath={selectedFile || undefined}
         fileContent={selectedFile ? fileContent : undefined}
         onContentChange={handleContentChange}
+        fontSize={fontSize}
       />
     </div>
   );

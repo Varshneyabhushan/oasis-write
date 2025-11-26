@@ -25,9 +25,10 @@ function getMarkdownFromEditor(editor: Editor): string {
 interface TipTapEditorProps {
   initialContent?: string;
   onChange?: (content: string) => void;
+  fontSize?: number;
 }
 
-const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange }) => {
+const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16 }) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -82,7 +83,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange }) => {
   }
 
   return (
-    <div className="tiptap-container">
+    <div className="tiptap-container" style={{ fontSize: `${fontSize}px` }}>
       <EditorContent editor={editor} />
     </div>
   );
