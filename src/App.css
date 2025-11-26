@@ -53,13 +53,52 @@ body {
 }
 
 .sidebar-header {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border-bottom: 0.0625rem solid var(--border-color);
   font-weight: 700;
   font-size: 0.875rem;
   color: var(--text-primary);
+}
+
+.sidebar-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.sidebar-tab {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-tab:hover {
+  background-color: rgba(93, 173, 226, 0.1);
+  color: var(--text-primary);
+}
+
+.sidebar-tab.active {
+  background-color: rgba(93, 173, 226, 0.15);
+  color: var(--accent-color);
+}
+
+.sidebar-title {
   text-transform: uppercase;
   letter-spacing: 0.0625rem;
+  font-size: 0.75rem;
+  color: var(--text-primary);
 }
 
 .sidebar-content {

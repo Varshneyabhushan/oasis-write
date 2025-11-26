@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import Welcome from "./components/Welcome";
-import Sidebar from "./components/Sidebar";
+import Sidebar, { SidebarView } from "./components/Sidebar";
 import Editor from "./components/Editor";
 import { FileEntry } from "./components/FileTree";
 import "./App.css";
@@ -16,6 +16,7 @@ function App() {
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarView, setSidebarView] = useState<SidebarView>('files');
   const [fontSize, setFontSize] = useState(16); // Default font size in pixels
   const AUTO_SAVE_DELAY = 2000; // Auto-save after 2 seconds of inactivity
 
@@ -117,10 +118,21 @@ function App() {
         e.preventDefault();
         saveFile();
       }
-      // Cmd/Ctrl + 1 to toggle zen mode (hide sidebar)
+      // Cmd/Ctrl + 1 to show file explorer
       if ((e.metaKey || e.ctrlKey) && e.key === '1') {
         e.preventDefault();
-        setSidebarVisible(!sidebarVisible);
+        setSidebarView('files');
+        if (!sidebarVisible) {
+          setSidebarVisible(true);
+        }
+      }
+      // Cmd/Ctrl + 2 to show outline
+      if ((e.metaKey || e.ctrlKey) && e.key === '2') {
+        e.preventDefault();
+        setSidebarView('outline');
+        if (!sidebarVisible) {
+          setSidebarVisible(true);
+        }
       }
       // Cmd/Ctrl + = or Cmd/Ctrl + + to increase font size
       if ((e.metaKey || e.ctrlKey) && (e.key === '=' || e.key === '+')) {
@@ -144,6 +156,11 @@ function App() {
     return () => document.removeEventListener('keydown', handleKeyDown, { capture: true });
   }, [saveFile, sidebarVisible, increaseFontSize, decreaseFontSize]);
 
+  // Handler for sidebar view change
+  const handleViewChange = (view: SidebarView) => {
+    setSidebarView(view);
+  };
+
   // Show welcome screen if no folder is opened
   if (!folderPath) {
     return <Welcome onFolderSelected={handleFolderSelected} />;
@@ -157,6 +174,9 @@ function App() {
         onFileSelect={handleFileSelect}
         selectedFile={selectedFile || undefined}
         folderPath={folderPath}
+        currentView={sidebarView}
+        onViewChange={handleViewChange}
+        fileContent={fileContent}
       />
       <Editor
         filePath={selectedFile || undefined}
