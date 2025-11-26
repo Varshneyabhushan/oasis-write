@@ -15,7 +15,6 @@ function App() {
   const [isDirty, setIsDirty] = useState(false);
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
-  const [zenMode, setZenMode] = useState(false);
 
   // Load folder contents
   const loadFolder = useCallback(async (path: string) => {
@@ -106,38 +105,32 @@ function App() {
         e.preventDefault();
         setSidebarVisible(!sidebarVisible);
       }
+      // Cmd/Ctrl + 1 to toggle zen mode (hide sidebar)
+      if ((e.metaKey || e.ctrlKey) && e.key === '1') {
+        e.preventDefault();
+        setSidebarVisible(!sidebarVisible);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [saveFile, sidebarVisible]);
 
-  const toggleSidebar = () => setSidebarVisible(!sidebarVisible);
-  const toggleZenMode = () => setZenMode(!zenMode);
-
   // Show welcome screen if no folder is opened
   if (!folderPath) {
     return <Welcome onFolderSelected={handleFolderSelected} />;
   }
 
-  const fileName = selectedFile ? selectedFile.split('/').pop() || 'Untitled.md' : 'Untitled.md';
-  const displayFileName = isDirty ? `${fileName} •` : fileName;
-
   return (
     <div className="app">
-      {!zenMode && (
-        <Sidebar
-          isVisible={sidebarVisible}
-          files={files}
-          onFileSelect={handleFileSelect}
-          selectedFile={selectedFile || undefined}
-          folderPath={folderPath}
-        />
-      )}
+      <Sidebar
+        isVisible={sidebarVisible}
+        files={files}
+        onFileSelect={handleFileSelect}
+        selectedFile={selectedFile || undefined}
+        folderPath={folderPath}
+      />
       <Editor
-        onToggleSidebar={toggleSidebar}
-        onToggleZenMode={toggleZenMode}
-        fileName={displayFileName}
         filePath={selectedFile || undefined}
         fileContent={selectedFile ? fileContent : undefined}
         onContentChange={handleContentChange}
