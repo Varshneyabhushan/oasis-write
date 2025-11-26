@@ -1,6 +1,7 @@
 // Configuration
 const GITHUB_REPO = 'Varshneyabhushan/oasis-write'; // Update with your actual username
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
+const GITHUB_RELEASES = `https://github.com/${GITHUB_REPO}/releases`;
 
 // Fetch latest release information
 async function fetchLatestRelease() {
@@ -63,29 +64,22 @@ function getDownloadUrl(assets, platform) {
 
 // Update download links
 function updateDownloadLinks(release) {
-    if (!release || !release.assets) {
-        console.error('No release assets found');
-        return;
-    }
-
-    const assets = release.assets;
+    const assets = release?.assets;
 
     // Update main download buttons
     const downloadButtons = document.querySelectorAll('[data-platform]');
     downloadButtons.forEach(button => {
         const platform = button.getAttribute('data-platform');
-        const url = getDownloadUrl(assets, platform);
-        if (url !== '#') {
-            button.href = url;
-        }
+        const url = assets ? getDownloadUrl(assets, platform) : '#';
+        button.href = url !== '#' ? url : GITHUB_RELEASES;
     });
 
     // Update macOS section
     const macosCard = document.querySelector('[data-platform="macos"]').closest('.download-card');
     const macosAlt = macosCard.querySelector('.alt-link');
     if (macosAlt) {
-        macosAlt.textContent = 'or download via Homebrew';
-        macosAlt.href = 'https://github.com/' + GITHUB_REPO + '#installation';
+        macosAlt.textContent = 'View all releases on GitHub';
+        macosAlt.href = GITHUB_RELEASES;
     }
 
     // Update Windows section
@@ -93,9 +87,7 @@ function updateDownloadLinks(release) {
     const windowsLinks = windowsCard.querySelectorAll('.alt-link');
     if (windowsLinks[0]) {
         const exeUrl = getDownloadUrl(assets, 'windows-alt');
-        if (exeUrl !== '#') {
-            windowsLinks[0].href = exeUrl;
-        }
+        windowsLinks[0].href = exeUrl !== '#' ? exeUrl : GITHUB_RELEASES;
     }
 
     // Update Linux section
@@ -103,15 +95,11 @@ function updateDownloadLinks(release) {
     const linuxLinks = linuxCard.querySelectorAll('.alt-link');
     if (linuxLinks[0]) {
         const debUrl = getDownloadUrl(assets, 'linux-deb');
-        if (debUrl !== '#') {
-            linuxLinks[0].href = debUrl;
-        }
+        linuxLinks[0].href = debUrl !== '#' ? debUrl : GITHUB_RELEASES;
     }
     if (linuxLinks[1]) {
         const rpmUrl = getDownloadUrl(assets, 'linux-rpm');
-        if (rpmUrl !== '#') {
-            linuxLinks[1].href = rpmUrl;
-        }
+        linuxLinks[1].href = rpmUrl !== '#' ? rpmUrl : GITHUB_RELEASES;
     }
 }
 
