@@ -66,3 +66,38 @@
   color: var(--text-secondary);
   font-size: 13px;
 }
+
+.inline-input-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.inline-input {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--accent-color);
+  border-radius: 2px;
+  padding: 2px 4px;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.inline-input.error {
+  border-color: #e74c3c;
+}
+
+.inline-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.inline-input-error {
+  font-size: 0.75rem;
+  color: #e74c3c;
+  margin-top: 2px;
+  padding-left: 4px;
+}

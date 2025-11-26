@@ -115,6 +115,27 @@ fn rename_file(old_path: String, new_path: String) -> Result<(), String> {
         .map_err(|e| format!("Failed to rename file: {}", e))
 }
 
+// Create a new folder
+#[tauri::command]
+fn create_folder(path: String) -> Result<(), String> {
+    fs::create_dir(&path)
+        .map_err(|e| format!("Failed to create folder: {}", e))
+}
+
+// Delete a folder (recursively)
+#[tauri::command]
+fn delete_folder(path: String) -> Result<(), String> {
+    fs::remove_dir_all(&path)
+        .map_err(|e| format!("Failed to delete folder: {}", e))
+}
+
+// Rename a folder
+#[tauri::command]
+fn rename_folder(old_path: String, new_path: String) -> Result<(), String> {
+    fs::rename(&old_path, &new_path)
+        .map_err(|e| format!("Failed to rename folder: {}", e))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -128,6 +149,9 @@ pub fn run() {
             create_file,
             delete_file,
             rename_file,
+            create_folder,
+            delete_folder,
+            rename_folder,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

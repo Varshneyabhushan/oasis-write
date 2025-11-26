@@ -4,6 +4,7 @@ import Welcome from "./components/Welcome";
 import Sidebar, { SidebarView } from "./components/Sidebar";
 import Editor from "./components/Editor";
 import { FileEntry } from "./components/FileTree";
+import ConfirmDialog from "./components/ConfirmDialog";
 import "./App.css";
 
 function App() {
@@ -19,6 +20,13 @@ function App() {
   const [sidebarView, setSidebarView] = useState<SidebarView>('files');
   const [fontSize, setFontSize] = useState(16); // Default font size in pixels
   const AUTO_SAVE_DELAY = 2000; // Auto-save after 2 seconds of inactivity
+
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean;
+    path: string;
+    name: string;
+    isDirectory: boolean;
+  } | null>(null);
 
   // Font size adjustment handlers
   const increaseFontSize = useCallback(() => {
@@ -96,6 +104,140 @@ function App() {
       setSaveStatus('unsaved');
     }
   };
+
+  // Create a new file
+  const handleCreateFile = useCallback(async (parentPath: string, fileName: string) => {
+    try {
+      // Ensure .md extension
+      const fullFileName = fileName.endsWith('.md') || fileName.endsWith('.markdown')
+        ? fileName
+        : `${fileName}.md`;
+
+      const filePath = `${parentPath}/${fullFileName}`;
+
+      await invoke("create_file", { path: filePath });
+
+      // Reload directory to show new file
+      if (folderPath) {
+        await loadFolder(folderPath);
+      }
+
+      // Auto-open the new file
+      await loadFile(filePath);
+
+    } catch (error) {
+      console.error("Failed to create file:", error);
+      alert(`Failed to create file: ${error}`);
+    }
+  }, [folderPath, loadFolder, loadFile]);
+
+  // Create a new folder
+  const handleCreateFolder = useCallback(async (parentPath: string, folderName: string) => {
+    try {
+      const newFolderPath = `${parentPath}/${folderName}`;
+
+      await invoke("create_folder", { path: newFolderPath });
+
+      // Reload directory to show new folder
+      if (folderPath) {
+        await loadFolder(folderPath);
+      }
+
+    } catch (error) {
+      console.error("Failed to create folder:", error);
+      alert(`Failed to create folder: ${error}`);
+    }
+  }, [folderPath, loadFolder]);
+
+  // Rename file or folder
+  const handleRename = useCallback(async (oldPath: string, newName: string) => {
+    try {
+      // Get parent directory path
+      const parentPath = oldPath.substring(0, oldPath.lastIndexOf('/'));
+      const newPath = `${parentPath}/${newName}`;
+
+      // Determine if it's a file or folder
+      const isFile = oldPath.endsWith('.md') || oldPath.endsWith('.markdown');
+
+      if (isFile) {
+        await invoke("rename_file", { oldPath, newPath });
+      } else {
+        await invoke("rename_folder", { oldPath, newPath });
+      }
+
+      // If currently selected file was renamed, update selectedFile
+      if (selectedFile === oldPath) {
+        setSelectedFile(newPath);
+      }
+
+      // Reload directory
+      if (folderPath) {
+        await loadFolder(folderPath);
+      }
+
+    } catch (error) {
+      console.error("Failed to rename:", error);
+      alert(`Failed to rename: ${error}`);
+    }
+  }, [folderPath, selectedFile, loadFolder]);
+
+  // Delete file or folder (with confirmation)
+  const handleDelete = useCallback(async (path: string, isDirectory: boolean) => {
+    const name = path.substring(path.lastIndexOf('/') + 1);
+
+    // Show confirmation dialog
+    setDeleteConfirmation({
+      isOpen: true,
+      path,
+      name,
+      isDirectory,
+    });
+  }, []);
+
+  // Confirm delete operation
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deleteConfirmation) return;
+
+    const { path, isDirectory } = deleteConfirmation;
+
+    try {
+      // Save current file if dirty and it's being deleted
+      if (isDirty && selectedFile?.startsWith(path)) {
+        await saveFile();
+      }
+
+      if (isDirectory) {
+        await invoke("delete_folder", { path });
+      } else {
+        await invoke("delete_file", { path });
+      }
+
+      // If currently selected file was deleted, clear selection
+      if (selectedFile === path || selectedFile?.startsWith(path + '/')) {
+        setSelectedFile(null);
+        setFileContent('');
+        setOriginalContent('');
+        setIsDirty(false);
+      }
+
+      // Reload directory
+      if (folderPath) {
+        await loadFolder(folderPath);
+      }
+
+      setDeleteConfirmation(null);
+
+    } catch (error) {
+      console.error("Failed to delete:", error);
+      alert(`Failed to delete: ${error}`);
+      setDeleteConfirmation(null);
+    }
+  }, [deleteConfirmation, folderPath, selectedFile, isDirty, loadFolder, saveFile]);
+
+  // Cancel delete operation
+  const handleCancelDelete = useCallback(() => {
+    setDeleteConfirmation(null);
+  }, []);
 
   // Auto-save with debouncing - saves after user stops typing for AUTO_SAVE_DELAY ms
   useEffect(() => {
@@ -185,6 +327,10 @@ function App() {
         currentView={sidebarView}
         onViewChange={handleViewChange}
         fileContent={fileContent}
+        onCreateFile={handleCreateFile}
+        onCreateFolder={handleCreateFolder}
+        onRename={handleRename}
+        onDelete={handleDelete}
       />
       <Editor
         filePath={selectedFile || undefined}
@@ -193,6 +339,24 @@ function App() {
         fontSize={fontSize}
         saveStatus={saveStatus}
       />
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirmation && (
+        <ConfirmDialog
+          isOpen={deleteConfirmation.isOpen}
+          title={`Delete ${deleteConfirmation.isDirectory ? 'Folder' : 'File'}`}
+          message={`Are you sure you want to delete "${deleteConfirmation.name}"?${
+            deleteConfirmation.isDirectory
+              ? ' All contents will be permanently deleted.'
+              : ' This action cannot be undone.'
+          }`}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+          isDanger={true}
+        />
+      )}
     </div>
   );
 }
