@@ -121,6 +121,7 @@
   border-radius: 0.125em;
   position: relative;
   transition: all 0.2s;
+  font-size: inherit;
 }
 
 .tiptap-editor ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
@@ -131,8 +132,9 @@
 .tiptap-editor ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
   content: '✓';
   position: absolute;
-  top: -0.125em;
-  left: 0.125em;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   color: var(--bg-primary);
   font-size: 0.875em;
   font-weight: bold;
