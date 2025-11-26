@@ -104,6 +104,33 @@ npm run tauri dev
 npm run tauri build
 ```
 
+## Building and Distribution
+
+### Quick Build
+
+To build installers for your platform:
+```bash
+npm run tauri build
+```
+
+Installers will be created in `src-tauri/target/release/bundle/`:
+- **macOS**: `.dmg` and `.app` files
+- **Windows**: `.msi` and `.exe` installers
+- **Linux**: `.deb`, `.AppImage`, and `.rpm` packages
+
+### Automated Multi-Platform Builds
+
+This project uses GitHub Actions to automatically build for all platforms:
+
+1. Update version in `package.json` and `src-tauri/tauri.conf.json`
+2. Create and push a version tag:
+   ```bash
+   git tag -a v0.1.0 -m "Release v0.1.0"
+   git push origin v0.1.0
+   ```
+3. GitHub Actions will build for macOS, Windows, and Linux
+4. Installers are automatically attached to the GitHub Release
+
 ## Tech Stack
 
 - **Frontend**: React 19 + TypeScript + Vite
