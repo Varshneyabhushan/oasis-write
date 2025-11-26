@@ -14,7 +14,7 @@ const Editor: FC<EditorProps> = ({
   fileContent,
   onContentChange,
   fontSize = 16,
-  saveStatus = 'saved'
+  // saveStatus = 'saved'
 }) => {
   // TODO: Add visual status bar to show save status (saved/saving/unsaved)
   // Status bar should display at the top of the editor with color-coded indicators
