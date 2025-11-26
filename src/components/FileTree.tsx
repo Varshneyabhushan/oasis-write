@@ -144,7 +144,6 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
           shortcut: 'Shift+N',
           onClick: handleNewFolder,
         },
-        { separator: true },
         {
           label: 'Rename',
           shortcut: 'F2',
