@@ -13,9 +13,11 @@ function App() {
   const [fileContent, setFileContent] = useState<string>("");
   const [originalContent, setOriginalContent] = useState<string>("");
   const [isDirty, setIsDirty] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [fontSize, setFontSize] = useState(16); // Default font size in pixels
+  const AUTO_SAVE_DELAY = 2000; // Auto-save after 2 seconds of inactivity
 
   // Font size adjustment handlers
   const increaseFontSize = useCallback(() => {
@@ -54,6 +56,7 @@ function App() {
   const saveFile = useCallback(async () => {
     if (!selectedFile || !isDirty) return;
 
+    setSaveStatus('saving');
     try {
       await invoke("write_file", {
         path: selectedFile,
@@ -61,9 +64,11 @@ function App() {
       });
       setOriginalContent(fileContent);
       setIsDirty(false);
+      setSaveStatus('saved');
       console.log("File saved successfully");
     } catch (error) {
       console.error("Failed to save file:", error);
+      setSaveStatus('unsaved');
     }
   }, [selectedFile, fileContent, isDirty]);
 
@@ -87,20 +92,20 @@ function App() {
     // Only mark as dirty if content actually changed from original
     if (content !== originalContent) {
       setIsDirty(true);
+      setSaveStatus('unsaved');
     }
   };
 
-  // Disable auto-save to prevent content corruption from markdown conversion
-  // User must manually save with Cmd/Ctrl+S
-  // useEffect(() => {
-  //   if (!isDirty || !selectedFile) return;
+  // Auto-save with debouncing - saves after user stops typing for AUTO_SAVE_DELAY ms
+  useEffect(() => {
+    if (!isDirty || !selectedFile) return;
 
-  //   const timer = setTimeout(() => {
-  //     saveFile();
-  //   }, 2000);
+    const timer = setTimeout(() => {
+      saveFile();
+    }, AUTO_SAVE_DELAY);
 
-  //   return () => clearTimeout(timer);
-  // }, [fileContent, isDirty, selectedFile, saveFile]);
+    return () => clearTimeout(timer);
+  }, [fileContent, isDirty, selectedFile, saveFile, AUTO_SAVE_DELAY]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -158,6 +163,7 @@ function App() {
         fileContent={selectedFile ? fileContent : undefined}
         onContentChange={handleContentChange}
         fontSize={fontSize}
+        saveStatus={saveStatus}
       />
     </div>
   );
