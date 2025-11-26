@@ -17,7 +17,7 @@ This directory contains the landing page for Oasis Write.
 Edit `script.js` and change the repository:
 
 ```javascript
-const GITHUB_REPO = 'yourusername/oasis-write'; // Change this!
+const GITHUB_REPO = 'Varshneyabhushan/oasis-write'; // Change this!
 ```
 
 ### 2. Customize Content
@@ -36,7 +36,7 @@ Edit `index.html`:
 3. Enable GitHub Pages in repository settings:
    - Go to Settings → Pages
    - Source: "GitHub Actions"
-   - Your site will be at `https://yourusername.github.io/oasis-write/`
+   - Your site will be at `https://Varshneyabhushan.github.io/oasis-write/`
 
 **Option B: Manual**
 1. Go to repository Settings → Pages
@@ -56,7 +56,7 @@ To use a custom domain like `oasis-write.com`:
    ```
    Type: CNAME
    Name: @ (or www)
-   Value: yourusername.github.io
+   Value: Varshneyabhushan.github.io
    ```
 3. Enable HTTPS in GitHub Pages settings
 4. Update links in `index.html`

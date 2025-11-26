@@ -1,5 +1,5 @@
 // Configuration
-const GITHUB_REPO = 'yourusername/oasis-write'; // Update with your actual username
+const GITHUB_REPO = 'Varshneyabhushan/oasis-write'; // Update with your actual username
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
 
 // Fetch latest release information
