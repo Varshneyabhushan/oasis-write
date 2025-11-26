@@ -11,12 +11,6 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@lexical/code": "^0.38.2",
-    "@lexical/link": "^0.38.2",
-    "@lexical/list": "^0.38.2",
-    "@lexical/markdown": "^0.38.2",
-    "@lexical/react": "^0.38.2",
-    "@lexical/rich-text": "^0.38.2",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2.4.2",
     "@tauri-apps/plugin-fs": "^2.4.4",
@@ -31,10 +25,7 @@
     "@tiptap/extension-typography": "^3.11.0",
     "@tiptap/react": "^3.11.0",
     "@tiptap/starter-kit": "^3.11.0",
-    "@types/prismjs": "^1.26.5",
-    "lexical": "^0.38.2",
     "lowlight": "^3.3.0",
-    "prismjs": "^1.30.0",
     "prosemirror-markdown": "^1.13.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

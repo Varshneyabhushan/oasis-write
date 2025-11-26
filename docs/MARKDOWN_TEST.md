@@ -31,14 +31,23 @@ Inline `code snippets` look like this.
 ### Unordered Lists
 
 - First item
+
 - Second item
+
 - Third item
+
 - Nested item 1
+
 - Nested item 2
-    - Deeply nested item
+
+  - Deeply nested item
+
 - Fourth item
+
 - Alternative bullet style
+
 - Another item
+
 - Nested with asterisk
 
 ### Ordered Lists
@@ -54,19 +63,22 @@ Inline `code snippets` look like this.
 
 [This is a link to Anthropic](https://www.anthropic.com)
 
-[Link with title](https://www.anthropic.com "Anthropic Homepage")
+[Link with title](https://www.anthropic.com)
 
 ## Blockquotes
 
-> This is a blockquote.
-> It can span multiple lines.
+> This is a blockquote. It can span multiple lines.
 
 > Blockquotes can also be nested.
-> >> Like this.
-> >>> And even deeper.
+>
+> > > Like this.
+> > >
+> > > > And even deeper.
 
 > **Note**: You can use other markdown inside blockquotes.
+>
 > - Like lists
+>
 > - And *formatting*
 
 ## Code Blocks
@@ -123,7 +135,7 @@ You can create horizontal rules with three or more hyphens, asterisks, or unders
 
 \*\*\*
 
-\_\_\_
+\__\_
 
 ## Mixed Content Example
 
@@ -139,7 +151,7 @@ Here's a real-world example combining multiple elements:
    npm install
 ```
 
-2. **Configuration**
+1. **Configuration**
 
    > **Important**: Make sure to configure your environment variables before starting.
 
@@ -150,10 +162,12 @@ Here's a real-world example combining multiple elements:
    PORT=3000
 ```
 
-3. **Run the Application**
+1. **Run the Application**
 
 - Development mode: `npm run dev`
+
 - Production build: `npm run build`
+
 - Start server: `npm start`
 
 ---
@@ -161,9 +175,13 @@ Here's a real-world example combining multiple elements:
 ### Code Review Checklist
 
 - [ ] Code follows style guidelines
+
 - [ ] All tests pass
+
 - [ ] Documentation is updated
+
 - [ ] No console errors
+
 - [ ] Performance is acceptable
 
 ## Special Characters and Escaping
@@ -180,7 +198,7 @@ You can escape special characters with backslash:
 
 *Italic* and **bold** can be combined: ***both italic and bold***
 
-Nested emphasis: *italic with&#32;**bold**&#32;inside*
+Nested emphasis: *italic with* ***bold*** *inside*
 
 ## Inline HTML (if supported)
 
@@ -189,7 +207,7 @@ Some markdown parsers support inline HTML, but Oasis Write focuses on pure markd
 ## Tables (GitHub Flavored Markdown)
 
 | Feature | Status | Priority |
-|---------|--------|----------|
+| --- | --- | --- |
 | Live Rendering | ✅ Done | High |
 | File Tree | ✅ Done | High |
 | Zen Mode | ✅ Done | Medium |
@@ -197,17 +215,22 @@ Some markdown parsers support inline HTML, but Oasis Write focuses on pure markd
 | Search | 📋 Backlog | Low |
 
 | Left Aligned | Center Aligned | Right Aligned |
-|:-------------|:--------------:|--------------:|
+| --- | --- | --- |
 | Left | Center | Right |
 | A | B | C |
 
 ## Task Lists
 
 - [x] Implement markdown editor
+
 - [x] Add file system support
+
 - [x] Create welcome screen
+
 - [ ] Add file watcher
+
 - [ ] Implement search
+
 - [ ] Add custom themes
 
 ## Long Paragraph Example
@@ -221,6 +244,7 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
 1. **First major point**
 
 - Sub-point with *emphasis*
+
 - Another sub-point
 
 ```javascript
@@ -230,19 +254,20 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
 
 - Back to sub-points
 
-2. **Second major point**
+1. **Second major point**
+
    > A blockquote within a list
    >
    > With multiple lines
 
    And some regular text in the list item.
 
-3. **Third major point**
+2. **Third major point**
 
 - Nested unordered list
 
-    1. Which contains ordered items
-    2. Like this
+  1. Which contains ordered items
+  2. Like this
 
 - Back to unordered
 
@@ -250,25 +275,25 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
 
 ### Direct Links
 
-- https://www.example.com (automatic link)
+- <https://www.example.com> (automatic link)
+
 - [Named link](https://www.example.com)
-- [Link with title](https://www.example.com "Example Domain")
+
+- [Link with title](https://www.example.com)
 
 ### Reference-Style Links
 
-[Reference link][1]
+[Reference link](https://www.anthropic.com)
 
-[Another reference][link-ref]
-
-[1]: https://www.anthropic.com
-[link-ref]: https://tauri.app
+[Another reference](https://tauri.app)
 
 ## Edge Cases
 
 ### Empty Elements
 
 Empty blockquote:
->
+
+> &lt;br /&gt;
 
 Empty code block:
 
@@ -277,17 +302,21 @@ Empty code block:
 
 ### Multiple Formatting
 
-This text has **bold and&#32;*italic*&#32;nested** together.
+This text has **bold and** ***italic*** **nested** together.
 
 This has `inline code with **bold** inside` (behavior varies).
 
 ### Special List Cases
 
 - Item with **bold**
+
 - Item with *italic*
+
 - Item with `code`
+
 - Item with [link](https://example.com)
-- Item with > a quote character
+
+- Item with &gt; a quote character
 
 ## Mathematical Expressions (if supported)
 
@@ -305,6 +334,8 @@ This document tests all major markdown features supported by Oasis Write. Use it
 
 ---
 
-**Last Updated**: November 2025
-**Purpose**: Testing & Documentation
-**Status**: Complete
+**Last Updated**: November 2025 **Purpose**: Testing & Documentation **Status**: Complete
+
+```
+{“testing”:”haha”}
+```
