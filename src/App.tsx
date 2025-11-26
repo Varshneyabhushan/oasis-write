@@ -118,19 +118,27 @@ function App() {
         e.preventDefault();
         saveFile();
       }
-      // Cmd/Ctrl + 1 to show file explorer
+      // Cmd/Ctrl + 1 to toggle file explorer
       if ((e.metaKey || e.ctrlKey) && e.key === '1') {
         e.preventDefault();
-        setSidebarView('files');
-        if (!sidebarVisible) {
+        // If sidebar is visible AND already showing files view, hide it (zen mode)
+        if (sidebarVisible && sidebarView === 'files') {
+          setSidebarVisible(false);
+        } else {
+          // Otherwise, show sidebar with files view
+          setSidebarView('files');
           setSidebarVisible(true);
         }
       }
-      // Cmd/Ctrl + 2 to show outline
+      // Cmd/Ctrl + 2 to toggle outline
       if ((e.metaKey || e.ctrlKey) && e.key === '2') {
         e.preventDefault();
-        setSidebarView('outline');
-        if (!sidebarVisible) {
+        // If sidebar is visible AND already showing outline view, hide it (zen mode)
+        if (sidebarVisible && sidebarView === 'outline') {
+          setSidebarVisible(false);
+        } else {
+          // Otherwise, show sidebar with outline view
+          setSidebarView('outline');
           setSidebarVisible(true);
         }
       }
@@ -154,7 +162,7 @@ function App() {
 
     document.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => document.removeEventListener('keydown', handleKeyDown, { capture: true });
-  }, [saveFile, sidebarVisible, increaseFontSize, decreaseFontSize]);
+  }, [saveFile, sidebarVisible, sidebarView, increaseFontSize, decreaseFontSize]);
 
   // Handler for sidebar view change
   const handleViewChange = (view: SidebarView) => {
