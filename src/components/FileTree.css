@@ -4,24 +4,27 @@
 
 .file-tree-item {
   font-size: 13px;
+  font-weight: 600;
 }
 
 .file-tree-row {
   display: flex;
   align-items: center;
-  padding: 4px 8px;
+  padding: 6px 8px;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.15s;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+  color: var(--text-primary);
 }
 
 .file-tree-row:hover {
-  background-color: var(--border-color);
+  background-color: rgba(93, 173, 226, 0.15);
 }
 
 .file-tree-row.selected {
-  background-color: var(--accent-color);
-  color: white;
+  background-color: rgba(93, 173, 226, 0.25);
+  color: var(--accent-color);
+  font-weight: 700;
 }
 
 .file-tree-arrow {
