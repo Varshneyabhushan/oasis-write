@@ -112,11 +112,6 @@ function App() {
         e.preventDefault();
         saveFile();
       }
-      // Cmd/Ctrl + B to toggle sidebar
-      if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
-        e.preventDefault();
-        setSidebarVisible(!sidebarVisible);
-      }
       // Cmd/Ctrl + 1 to toggle zen mode (hide sidebar)
       if ((e.metaKey || e.ctrlKey) && e.key === '1') {
         e.preventDefault();
