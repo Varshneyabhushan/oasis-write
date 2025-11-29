@@ -154,7 +154,6 @@ Here's a real-world example combining multiple elements:
 ```
 
 1. **Run the Application**
-
 - Development mode: `npm run dev`
 - Production build: `npm run build`
 - Start server: `npm start`
@@ -222,7 +221,6 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
 ## Nested Lists with Mixed Content
 
 1. **First major point**
-
 - Sub-point with *emphasis*
 - Another sub-point
 
@@ -232,7 +230,6 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
 ```
 
 - Back to sub-points
-
 1. **Second major point**
 
    > A blockquote within a list
@@ -242,7 +239,6 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
    And some regular text in the list item.
 
 2. **Third major point**
-
 - Nested unordered list
   1. Which contains ordered items
   2. Like this
