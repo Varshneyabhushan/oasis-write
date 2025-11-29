@@ -8,167 +8,139 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="hero">
-        <nav class="nav">
-            <div class="nav-content">
-                <div class="logo">Oasis Write</div>
-                <div class="nav-links">
-                    <a href="#features">Features</a>
-                    <a href="#download">Download</a>
-                    <a href="https://github.com/Varshneyabhushan/oasis-write" target="_blank">GitHub</a>
-                </div>
-            </div>
-        </nav>
+    <div class="markdown-container">
+        <article class="markdown-content">
+            <h1>Oasis Write</h1>
 
-        <div class="hero-content">
-            <h1 class="hero-title">A Serene Space for Your Words</h1>
-            <p class="hero-subtitle">Live Markdown preview, outline-driven navigation, and a distraction-free editor built with Tauri and React.</p>
-            <div class="hero-cta">
-                <a href="#download" class="btn btn-primary">Download Now</a>
-                <a href="https://github.com/Varshneyabhushan/oasis-write" class="btn btn-secondary" target="_blank">View on GitHub</a>
-            </div>
-            <p class="version-info">Latest version: <span id="latest-version">0.1.0</span> • Free & Open Source</p>
-        </div>
-    </header>
+            <p>A minimal, distraction-free markdown editor designed for writers who value clarity and focus.</p>
 
-    <section class="features" id="features">
-        <div class="container">
-            <h2 class="section-title">Designed for Focus</h2>
-            <p class="section-subtitle">Everything you need, nothing you don't</p>
+            <hr>
 
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Instant Markdown</h3>
-                    <p>TipTap-powered editor with live formatting as you type—no split panes required.</p>
-                </div>
+            <h2>What is Oasis Write?</h2>
 
-                <div class="feature-card">
-                    <div class="feature-icon">💾</div>
-                    <h3>Auto-Save</h3>
-                    <p>Automatic saves after you pause typing with clear saved/saving/unsaved indicators.</p>
-                </div>
+            <p>Oasis Write is a <strong>native desktop application</strong> built with <a href="https://tauri.app" target="_blank">Tauri</a> and React that provides a serene space for your markdown writing. No complex menus, no overwhelming toolbars—just you and your words.</p>
 
-                <div class="feature-card">
-                    <div class="feature-icon">📑</div>
-                    <h3>Document Outline</h3>
-                    <p>Hierarchical outline of headings to jump around long documents instantly.</p>
-                </div>
+            <blockquote>
+                "The best writing tool is the one that gets out of your way."
+            </blockquote>
 
-                <div class="feature-card">
-                    <div class="feature-icon">🗂</div>
-                    <h3>File Tree Control</h3>
-                    <p>Create, rename, and delete files or folders with inline edits and context menus.</p>
-                </div>
+            <h2>Features</h2>
 
-                <div class="feature-card">
-                    <div class="feature-icon">🧘</div>
-                    <h3>Zen Mode</h3>
-                    <p>Toggle the sidebar and chrome away to focus purely on the words.</p>
-                </div>
+            <h3>Live Markdown Rendering</h3>
 
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3>Native & Fast</h3>
-                    <p>Built with Tauri and Rust for small install size, quick startup, and a native feel.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+            <p>See your markdown come to life as you type. Format text using <strong>bold</strong>, <em>italic</em>, and <code>inline code</code> without switching between editor and preview modes.</p>
 
-    <section class="comparison">
-        <div class="container">
-            <h2 class="section-title">Built for Focused Writing</h2>
-            <p class="section-subtitle">Fast feedback, simple navigation, and calm UI defaults</p>
+            <pre><code>// Write code blocks with proper formatting
+function greet(name) {
+  return `Hello, ${name}!`;
+}</code></pre>
 
-            <div class="comparison-grid">
-                <div class="comparison-card highlight">
-                    <h4>Live Preview</h4>
-                    <p>Markdown renders immediately so you stay in flow without switching views.</p>
-                </div>
-                <div class="comparison-card">
-                    <h4>Two Sidebar Modes</h4>
-                    <p>Switch between file tree and outline, or hide them entirely for deep focus.</p>
-                </div>
-                <div class="comparison-card">
-                    <h4>Keyboard Friendly</h4>
-                    <p>Shortcuts for switching panes, adjusting font size, and managing files.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+            <h3>Document Organization</h3>
 
-    <section class="download" id="download">
-        <div class="container">
-            <h2 class="section-title">Download Oasis Write</h2>
-            <p class="section-subtitle">Built for macOS, Windows, and Linux via GitHub Releases</p>
+            <ul class="task-list">
+                <li>
+                    <input type="checkbox" checked disabled>
+                    <span>File tree for managing your markdown documents</span>
+                </li>
+                <li>
+                    <input type="checkbox" checked disabled>
+                    <span>Automatic outline generation from headings</span>
+                </li>
+                <li>
+                    <input type="checkbox" checked disabled>
+                    <span>Quick navigation between sections</span>
+                </li>
+                <li>
+                    <input type="checkbox" checked disabled>
+                    <span>Auto-save with status indicators</span>
+                </li>
+            </ul>
 
-            <div class="download-grid">
-                <div class="download-card">
-                    <div class="platform-icon">🍎</div>
-                    <h3>macOS</h3>
+            <h3>Distraction-Free Writing</h3>
+
+            <p>Toggle the sidebar to enter zen mode. Hide everything except your words. Focus on what matters.</p>
+
+            <h2>Download</h2>
+
+            <p>Oasis Write is available for macOS, Windows, and Linux. Choose your platform below:</p>
+
+            <div class="download-section">
+                <div class="download-option">
+                    <h4>macOS</h4>
                     <p>Universal Binary (Intel & Apple Silicon)</p>
-                    <a href="#" class="btn btn-download" data-platform="macos">Download .dmg</a>
-                    <p class="download-alt">
-                        <a href="#" class="alt-link">View all releases on GitHub</a>
-                    </p>
+                    <a href="#" class="download-button" data-platform="macos">Download .dmg</a>
                 </div>
 
-                <div class="download-card">
-                    <div class="platform-icon">🪟</div>
-                    <h3>Windows</h3>
+                <div class="download-option">
+                    <h4>Windows</h4>
                     <p>Windows 10 & 11</p>
-                    <a href="#" class="btn btn-download" data-platform="windows">Download .msi</a>
-                    <p class="download-alt">
-                        <a href="#" class="alt-link">or download .exe installer</a>
-                    </p>
+                    <a href="#" class="download-button" data-platform="windows">Download .msi</a>
                 </div>
 
-                <div class="download-card">
-                    <div class="platform-icon">🐧</div>
-                    <h3>Linux</h3>
+                <div class="download-option">
+                    <h4>Linux</h4>
                     <p>AppImage, .deb, .rpm</p>
-                    <a href="#" class="btn btn-download" data-platform="linux">Download AppImage</a>
-                    <p class="download-alt">
-                        <a href="#" class="alt-link">.deb</a> •
-                        <a href="#" class="alt-link">.rpm</a>
-                    </p>
+                    <a href="#" class="download-button" data-platform="linux">Download AppImage</a>
                 </div>
             </div>
 
-            <p class="download-note">
-                Download links update from the latest GitHub Release. If a link is missing, head to <a href="https://github.com/Varshneyabhushan/oasis-write/releases" target="_blank">GitHub Releases</a>.
-            </p>
-        </div>
-    </section>
+            <p class="note">Latest version: <span id="latest-version">0.1.0</span> • All downloads are free and open source</p>
 
-    <section class="cta">
-        <div class="container">
-            <h2>Ready to Find Your Writing Oasis?</h2>
-            <p>Free, open source, and yours forever. No subscriptions, no lock-in.</p>
-            <a href="#download" class="btn btn-primary btn-large">Download Now</a>
-        </div>
-    </section>
+            <p class="note">Looking for a specific format? Visit <a href="https://github.com/Varshneyabhushan/oasis-write/releases" target="_blank">GitHub Releases</a> for all available downloads.</p>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Oasis Write</h4>
-                    <p>A serene markdown writing environment.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <a href="https://github.com/Varshneyabhushan/oasis-write">GitHub</a>
-                    <a href="https://github.com/Varshneyabhushan/oasis-write/issues">Report Issues</a>
-                    <a href="https://github.com/Varshneyabhushan/oasis-write/releases">Releases</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Oasis Write.</p>
-            </div>
-        </div>
-    </footer>
+            <h2>Technical Details</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Technology</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Framework</td>
+                        <td>Tauri + React</td>
+                    </tr>
+                    <tr>
+                        <td>Editor</td>
+                        <td>TipTap (ProseMirror)</td>
+                    </tr>
+                    <tr>
+                        <td>Language</td>
+                        <td>TypeScript + Rust</td>
+                    </tr>
+                    <tr>
+                        <td>License</td>
+                        <td>Open Source</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Why Choose Oasis Write?</h2>
+
+            <ol>
+                <li><strong>Fast & Lightweight:</strong> Built with Tauri and Rust for quick startup and minimal resource usage</li>
+                <li><strong>Privacy First:</strong> Everything stays local. No cloud sync, no tracking, no accounts required</li>
+                <li><strong>Open Source:</strong> Free forever. Inspect the code, contribute, or fork it for your own use</li>
+                <li><strong>Cross-Platform:</strong> Works seamlessly on macOS, Windows, and Linux</li>
+            </ol>
+
+            <hr>
+
+            <h2>Get Started</h2>
+
+            <p>Ready to create your writing oasis? Download the app for your platform and open a folder containing markdown files. That's it.</p>
+
+            <p>Have questions or found a bug? <a href="https://github.com/Varshneyabhushan/oasis-write/issues" target="_blank">Open an issue on GitHub</a> or contribute to the project.</p>
+
+            <hr>
+
+            <footer class="page-footer">
+                <p>Built with care for writers who value simplicity • <a href="https://github.com/Varshneyabhushan/oasis-write" target="_blank">View on GitHub</a></p>
+            </footer>
+        </article>
+    </div>
 
     <script src="script.js"></script>
 </body>
