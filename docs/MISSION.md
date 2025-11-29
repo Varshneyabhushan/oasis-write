@@ -39,11 +39,7 @@ Oasis-write is an opinionated application with a clear focus.
 Our differentiation comes from a deliberate focus on the writing experience.
 
 - **Focus over Features:** Unlike Notion and Obsidian, we don't aim to be an everything-tool. Our feature set is intentionally limited to what's essential for a great markdown writing experience. This keeps the app lightweight, fast, and easy to learn.
-
 - **Seamless "Live" Rendering:** While Obsidian renders markdown after you move to a new line, and Notion isn't truly markdown-native, Oasis-write provides instant formatting the moment you type the syntax (e.g., `# `immediately becomes a large heading). This creates a fluid, intuitive experience that feels less like coding and more like writing.
-
 - **Simplicity and Elegance:** We prioritize a clean, minimalist UI that gets out of your way. There are no distracting panes, complex settings, or bloated menus. Just your files and your words.
-
 - **You Own Your Data:** Unlike database-driven apps, Oasis-write works directly with your local markdown files. Your content is always yours, in a portable, universally readable format. There's no lock-in, ever.
-
 - **Truly Native & Cross-Platform:** Oasis-write is not a web app you use in a browser; it's a real desktop application that runs on macOS, Windows, and Linux. This provides a more integrated and stable experience.
