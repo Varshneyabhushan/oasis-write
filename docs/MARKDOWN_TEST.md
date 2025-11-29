@@ -31,23 +31,14 @@ Inline `code snippets` look like this.
 ### Unordered Lists
 
 - First item
-
 - Second item
-
 - Third item
-
 - Nested item 1
-
 - Nested item 2
-
   - Deeply nested item
-
 - Fourth item
-
 - Alternative bullet style
-
 - Another item
-
 - Nested with asterisk
 
 ### Ordered Lists
@@ -165,9 +156,7 @@ Here's a real-world example combining multiple elements:
 1. **Run the Application**
 
 - Development mode: `npm run dev`
-
 - Production build: `npm run build`
-
 - Start server: `npm start`
 
 ---
@@ -175,13 +164,9 @@ Here's a real-world example combining multiple elements:
 ### Code Review Checklist
 
 - [ ] Code follows style guidelines
-
 - [ ] All tests pass
-
 - [ ] Documentation is updated
-
 - [ ] No console errors
-
 - [ ] Performance is acceptable
 
 ## Special Characters and Escaping
@@ -222,15 +207,10 @@ Some markdown parsers support inline HTML, but Oasis Write focuses on pure markd
 ## Task Lists
 
 - [x] Implement markdown editor
-
 - [x] Add file system support
-
 - [x] Create welcome screen
-
 - [ ] Add file watcher
-
 - [ ] Implement search
-
 - [ ] Add custom themes
 
 ## Long Paragraph Example
@@ -244,7 +224,6 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
 1. **First major point**
 
 - Sub-point with *emphasis*
-
 - Another sub-point
 
 ```javascript
@@ -265,10 +244,8 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
 2. **Third major point**
 
 - Nested unordered list
-
   1. Which contains ordered items
   2. Like this
-
 - Back to unordered
 
 ## Links and References
@@ -276,9 +253,7 @@ This is a new paragraph. Paragraphs are separated by blank lines. Multiple conse
 ### Direct Links
 
 - <https://www.example.com> (automatic link)
-
 - [Named link](https://www.example.com)
-
 - [Link with title](https://www.example.com)
 
 ### Reference-Style Links
@@ -309,13 +284,9 @@ This has `inline code with **bold** inside` (behavior varies).
 ### Special List Cases
 
 - Item with **bold**
-
 - Item with *italic*
-
 - Item with `code`
-
 - Item with [link](https://example.com)
-
 - Item with &gt; a quote character
 
 ## Mathematical Expressions (if supported)
@@ -337,5 +308,5 @@ This document tests all major markdown features supported by Oasis Write. Use it
 **Last Updated**: November 2025 **Purpose**: Testing & Documentation **Status**: Complete
 
 ```
-{“testing”:”haha”}
+{"testing":"haha"}
 ```
