@@ -16,6 +16,7 @@
     "@tauri-apps/plugin-fs": "^2.4.4",
     "@tauri-apps/plugin-opener": "^2",
     "@tiptap/extension-code-block-lowlight": "^3.11.0",
+    "@tiptap/extension-link": "^3.11.1",
     "@tiptap/extension-table": "^3.11.0",
     "@tiptap/extension-table-cell": "^3.11.0",
     "@tiptap/extension-table-header": "^3.11.0",
