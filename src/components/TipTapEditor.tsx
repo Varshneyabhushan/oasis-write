@@ -47,10 +47,50 @@ const CustomLink = Link.extend({
   },
 });
 
+// Helper to clean up markdown - removes extra blank lines between list items
+function cleanupMarkdown(markdown: string): string {
+  const lines = markdown.split('\n');
+  const result: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const currentLine = lines[i];
+    const nextLine = lines[i + 1];
+
+    // Check if current line is empty and next line is a list item
+    const isEmpty = currentLine.trim() === '';
+    const isListItem = (line: string) => {
+      if (!line) return false;
+      const trimmed = line.trim();
+      // Match task list items: - [ ] or - [x]
+      // Match regular list items: -, *, +, or numbered
+      return /^[-*+]\s/.test(trimmed) || /^\d+\.\s/.test(trimmed);
+    };
+
+    // If this is a blank line between two list items, skip it
+    if (isEmpty && nextLine && isListItem(nextLine)) {
+      const prevLine = i > 0 ? lines[i - 1] : '';
+      if (isListItem(prevLine)) {
+        continue; // Skip this blank line
+      }
+    }
+
+    result.push(currentLine);
+  }
+
+  // Always ensure trailing newline (POSIX standard for text files)
+  let cleaned = result.join('\n');
+  if (!cleaned.endsWith('\n')) {
+    cleaned += '\n';
+  }
+
+  return cleaned;
+}
+
 // Helper to get markdown content from editor
 function getMarkdownFromEditor(editor: Editor): string {
   // @ts-ignore - tiptap-markdown adds this to storage
-  return editor.storage.markdown?.getMarkdown() || '';
+  const rawMarkdown = editor.storage.markdown?.getMarkdown() || '';
+  return cleanupMarkdown(rawMarkdown);
 }
 
 interface TipTapEditorProps {
