@@ -1,5 +1,5 @@
-import { FC, useState, useEffect } from 'react';
-import { DndContext, useDroppable, DragEndEvent, DragOverlay, DragStartEvent, rectIntersection, CollisionDetection, pointerWithin, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { FC, useState } from 'react';
+import { DndContext, useDroppable, DragEndEvent, DragOverlay, DragStartEvent, rectIntersection, CollisionDetection, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import FileTree, { FileEntry } from './FileTree';
 import Outline from './Outline';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
@@ -330,16 +330,6 @@ const Sidebar: FC<SidebarProps> = ({
       await onCreateFolder(folderPath, name);
     }
     setRootCreating(null);
-  };
-
-  const handleDragOver = (event: any) => {
-    // Only log when over root folder
-    if (event.over?.id && event.over.id.toString().startsWith('root-folder-')) {
-      console.log('[ROOT DRAG OVER]', {
-        activeId: event.active?.id,
-        overId: event.over?.id
-      });
-    }
   };
 
   return (
