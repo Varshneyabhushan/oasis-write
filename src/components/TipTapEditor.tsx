@@ -13,6 +13,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import { Markdown } from 'tiptap-markdown';
 import { common, createLowlight } from 'lowlight';
 import { InputRule } from '@tiptap/core';
+import { CollapsibleHeading } from '../extensions/CollapsibleHeading';
 
 import './TipTapEditor.css';
 
@@ -104,6 +105,10 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
     extensions: [
       StarterKit.configure({
         codeBlock: false, // We'll use CodeBlockLowlight instead
+        heading: false, // We'll use CollapsibleHeading instead
+      }),
+      CollapsibleHeading.configure({
+        levels: [1, 2, 3, 4, 5, 6],
       }),
       CustomLink.configure({
         openOnClick: true,
