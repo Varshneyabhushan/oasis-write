@@ -345,7 +345,7 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${sidebarVisible ? 'sidebar-visible' : ''}`}>
       <Sidebar
         isVisible={sidebarVisible}
         files={files}

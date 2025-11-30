@@ -5,6 +5,11 @@
   padding-bottom: 75vh;
 }
 
+/* Wider content when sidebar is visible to balance the wider sidebar */
+.sidebar-visible .tiptap-container {
+  max-width: 90%;
+}
+
 .tiptap-editor {
   outline: none;
   font-size: 1em;
