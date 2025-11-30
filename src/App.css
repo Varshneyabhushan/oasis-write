@@ -1,5 +1,5 @@
 :root {
-  --sidebar-width: 20rem;
+  --sidebar-width: 25rem;
   /* Theme colors are set dynamically by ThemeProvider */
 
   font-family: monospace;
