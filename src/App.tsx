@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { Editor as TipTapEditorType } from "@tiptap/react";
 import Welcome from "./components/Welcome";
 import Sidebar, { SidebarView } from "./components/Sidebar";
 import Editor from "./components/Editor";
@@ -27,6 +28,8 @@ function App() {
     name: string;
     isDirectory: boolean;
   } | null>(null);
+
+  const [editorInstance, setEditorInstance] = useState<TipTapEditorType | null>(null);
 
   // Font size adjustment handlers
   const increaseFontSize = useCallback(() => {
@@ -339,6 +342,33 @@ function App() {
     setSidebarView(view);
   };
 
+  // Scroll to heading in editor
+  const scrollToHeading = useCallback((headingText: string, headingLevel: number) => {
+    if (!editorInstance) return;
+
+    const doc = editorInstance.state.doc;
+    let targetPos: number | null = null;
+
+    // Search document for matching heading
+    doc.descendants((node, pos) => {
+      if (node.type.name === 'heading' &&
+          node.attrs.level === headingLevel &&
+          node.textContent.trim() === headingText.trim()) {
+        targetPos = pos;
+        return false; // Stop after first match
+      }
+    });
+
+    if (targetPos !== null) {
+      // Get DOM node and scroll to it
+      const dom = editorInstance.view.domAtPos(targetPos + 1);
+      const element = dom.node.nodeType === 1
+        ? (dom.node as Element)
+        : (dom.node.parentElement as Element);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [editorInstance]);
+
   // Show welcome screen if no folder is opened
   if (!folderPath) {
     return <Welcome onFolderSelected={handleFolderSelected} />;
@@ -360,6 +390,7 @@ function App() {
         onRename={handleRename}
         onDelete={handleDelete}
         onMove={handleMove}
+        onHeadingClick={scrollToHeading}
       />
       <Editor
         filePath={selectedFile || undefined}
@@ -367,6 +398,7 @@ function App() {
         onContentChange={handleContentChange}
         fontSize={fontSize}
         saveStatus={saveStatus}
+        onEditorReady={setEditorInstance}
       />
 
       {/* Delete Confirmation Dialog */}

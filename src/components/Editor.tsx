@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import TipTapEditor from './TipTapEditor';
+import { Editor as TipTapEditorType } from '@tiptap/react';
 
 interface EditorProps {
   filePath?: string;
@@ -7,6 +8,7 @@ interface EditorProps {
   onContentChange?: (content: string) => void;
   fontSize?: number;
   saveStatus?: 'saved' | 'saving' | 'unsaved';
+  onEditorReady?: (editor: TipTapEditorType) => void;
 }
 
 const Editor: FC<EditorProps> = ({
@@ -14,6 +16,7 @@ const Editor: FC<EditorProps> = ({
   fileContent,
   onContentChange,
   fontSize = 16,
+  onEditorReady,
   // saveStatus = 'saved'
 }) => {
   // TODO: Add visual status bar to show save status (saved/saving/unsaved)
@@ -27,6 +30,7 @@ const Editor: FC<EditorProps> = ({
           initialContent={fileContent}
           onChange={onContentChange}
           fontSize={fontSize}
+          onEditorReady={onEditorReady}
         />
       </main>
     </div>

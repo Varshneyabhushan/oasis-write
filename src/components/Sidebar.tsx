@@ -23,6 +23,7 @@ interface DroppableContentProps {
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
   onMove: (sourcePath: string, targetDir: string, isDirectory: boolean) => Promise<void>;
+  onHeadingClick?: (text: string, level: number) => void;
   handleSidebarContextMenu: (e: React.MouseEvent) => void;
   getRootContextMenuItems: () => ContextMenuItem[];
   validateRootFileName: (name: string, isFile: boolean) => string | null;
@@ -46,6 +47,7 @@ const DroppableContent: FC<DroppableContentProps> = ({
   onRename,
   onDelete,
   onMove,
+  onHeadingClick,
   handleSidebarContextMenu,
   getRootContextMenuItems,
   validateRootFileName,
@@ -124,7 +126,7 @@ const DroppableContent: FC<DroppableContentProps> = ({
           )}
         </>
       ) : (
-        <Outline content={fileContent || ''} />
+        <Outline content={fileContent || ''} onHeadingClick={onHeadingClick} />
       )}
     </div>
   );
@@ -144,6 +146,7 @@ interface SidebarProps {
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
   onMove: (sourcePath: string, targetDir: string, isDirectory: boolean) => Promise<void>;
+  onHeadingClick?: (text: string, level: number) => void;
 }
 
 const Sidebar: FC<SidebarProps> = ({
@@ -159,7 +162,8 @@ const Sidebar: FC<SidebarProps> = ({
   onCreateFolder,
   onRename,
   onDelete,
-  onMove
+  onMove,
+  onHeadingClick
 }) => {
   const folderName = folderPath ? folderPath.split('/').pop() || 'Files' : 'Files';
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
@@ -382,6 +386,7 @@ const Sidebar: FC<SidebarProps> = ({
         onRename={onRename}
         onDelete={onDelete}
         onMove={onMove}
+        onHeadingClick={onHeadingClick}
         handleSidebarContextMenu={handleSidebarContextMenu}
         getRootContextMenuItems={getRootContextMenuItems}
         validateRootFileName={validateRootFileName}

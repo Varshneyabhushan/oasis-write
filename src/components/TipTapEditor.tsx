@@ -98,9 +98,10 @@ interface TipTapEditorProps {
   initialContent?: string;
   onChange?: (content: string) => void;
   fontSize?: number;
+  onEditorReady?: (editor: Editor) => void;
 }
 
-const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16 }) => {
+const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16, onEditorReady }) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -151,6 +152,13 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
       }
     },
   });
+
+  // Notify parent when editor is ready
+  useEffect(() => {
+    if (editor && onEditorReady) {
+      onEditorReady(editor);
+    }
+  }, [editor, onEditorReady]);
 
   // Update content when initialContent changes (file switch)
   useEffect(() => {

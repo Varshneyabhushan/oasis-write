@@ -10,6 +10,22 @@
   gap: 0.5rem;
   line-height: 1.5;
   min-height: 1.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-radius: 0.25rem;
+}
+
+.outline-item:hover {
+  background-color: var(--code-bg);
+}
+
+.outline-item:hover .outline-text {
+  color: var(--accent-color);
+}
+
+.outline-item:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
 }
 
 .outline-tree-line {

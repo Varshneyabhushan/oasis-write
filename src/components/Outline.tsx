@@ -9,9 +9,10 @@ interface HeadingItem {
 
 interface OutlineProps {
   content: string;
+  onHeadingClick?: (text: string, level: number) => void;
 }
 
-const Outline: FC<OutlineProps> = ({ content }) => {
+const Outline: FC<OutlineProps> = ({ content, onHeadingClick }) => {
   const headings = useMemo(() => {
     if (!content) return [];
 
@@ -53,6 +54,16 @@ const Outline: FC<OutlineProps> = ({ content }) => {
               paddingLeft: `${(heading.level - 1) * 1.25}rem`,
               position: 'relative'
             }}
+            onClick={() => onHeadingClick?.(heading.text, heading.level)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onHeadingClick?.(heading.text, heading.level);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Jump to ${heading.text}`}
           >
             {/* Vertical line for tree structure */}
             {heading.level > 1 && (
