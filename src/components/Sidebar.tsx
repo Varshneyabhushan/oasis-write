@@ -252,6 +252,12 @@ const Sidebar: FC<SidebarProps> = ({
       return;
     }
 
+    // Don't move if already in the target folder (no-op)
+    const sourceParentPath = sourceEntry.path.substring(0, sourceEntry.path.lastIndexOf('/'));
+    if (sourceParentPath === targetEntry.path) {
+      return;
+    }
+
     // Perform the move
     onMove(sourceEntry.path, targetEntry.path, sourceEntry.is_directory);
   };
