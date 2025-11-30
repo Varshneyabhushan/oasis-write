@@ -194,6 +194,36 @@ function App() {
     });
   }, []);
 
+  // Move file or folder to a target directory
+  const handleMove = useCallback(async (sourcePath: string, targetDir: string, isDirectory: boolean) => {
+    try {
+      await invoke("move_item", { sourcePath, targetDir });
+
+      // If the moved item was the selected file or contains it, update selection
+      if (selectedFile === sourcePath) {
+        // Update selected file path to the new location
+        const fileName = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+        const newPath = `${targetDir}/${fileName}`;
+        setSelectedFile(newPath);
+      } else if (isDirectory && selectedFile?.startsWith(sourcePath + '/')) {
+        // If a folder containing the selected file was moved
+        const fileName = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+        const relativePath = selectedFile.substring(sourcePath.length + 1);
+        const newPath = `${targetDir}/${fileName}/${relativePath}`;
+        setSelectedFile(newPath);
+      }
+
+      // Reload directory to reflect changes
+      if (folderPath) {
+        await loadFolder(folderPath);
+      }
+
+    } catch (error) {
+      console.error("Failed to move:", error);
+      alert(`Failed to move: ${error}`);
+    }
+  }, [folderPath, selectedFile, loadFolder]);
+
   // Confirm delete operation
   const handleConfirmDelete = useCallback(async () => {
     if (!deleteConfirmation) return;
@@ -329,6 +359,7 @@ function App() {
         onCreateFolder={handleCreateFolder}
         onRename={handleRename}
         onDelete={handleDelete}
+        onMove={handleMove}
       />
       <Editor
         filePath={selectedFile || undefined}

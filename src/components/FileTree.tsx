@@ -1,4 +1,5 @@
 import { FC, useState } from 'react';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 import InlineInput from './InlineInput';
 import './FileTree.css';
@@ -18,6 +19,7 @@ interface FileTreeProps {
   onCreateFolder: (parentPath: string, folderName: string) => Promise<void>;
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
+  onMove: (sourcePath: string, targetPath: string, isDirectory: boolean) => Promise<void>;
 }
 
 interface FileTreeItemProps {
@@ -29,6 +31,7 @@ interface FileTreeItemProps {
   onCreateFolder: (parentPath: string, folderName: string) => Promise<void>;
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
+  onMove: (sourcePath: string, targetPath: string, isDirectory: boolean) => Promise<void>;
 }
 
 const FileTreeItem: FC<FileTreeItemProps> = ({
@@ -39,13 +42,35 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
   onCreateFile,
   onCreateFolder,
   onRename,
-  onDelete
+  onDelete,
+  onMove
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [isCreating, setIsCreating] = useState<'file' | 'folder' | null>(null);
   const [isRenaming, setIsRenaming] = useState(false);
   const isSelected = selectedPath === entry.path;
+
+  // Set up draggable
+  const { attributes: draggableAttributes, listeners, setNodeRef: setDraggableRef, isDragging } = useDraggable({
+    id: entry.path,
+    data: {
+      entry,
+    },
+    disabled: isRenaming,
+  });
+
+  // Set up droppable (only for directories)
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+    id: `droppable-${entry.path}`,
+    disabled: !entry.is_directory,
+    data: {
+      entry,
+    },
+  });
+
+  // Separate draggable (on row) from droppable (on container)
+  // This allows the entire folder area (including children) to be droppable
 
   const handleClick = () => {
     if (entry.is_directory) {
@@ -171,13 +196,20 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
     }
   };
 
+  const rowClasses = `file-tree-row ${isSelected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`;
+  const itemClasses = `file-tree-item ${isOver && entry.is_directory ? 'drag-over' : ''}`;
+
   return (
-    <div className="file-tree-item">
+    <div
+      className={itemClasses}
+      ref={entry.is_directory ? setDroppableRef : undefined}
+    >
       <div
-        className={`file-tree-row ${isSelected ? 'selected' : ''}`}
+        ref={setDraggableRef}
+        className={rowClasses}
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
-        onClick={handleClick}
         onContextMenu={handleContextMenu}
+        {...draggableAttributes}
       >
         {isRenaming ? (
           <InlineInput
@@ -190,13 +222,21 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
         ) : (
           <>
             {entry.is_directory ? (
-              <span className={`file-tree-arrow ${isExpanded ? 'expanded' : ''}`}>
+              <span className={`file-tree-arrow ${isExpanded ? 'expanded' : ''}`} onClick={handleClick}>
                 ▶
               </span>
             ) : (
               <span className="file-tree-spacer"></span>
             )}
-            <span className="file-tree-name">{entry.name}</span>
+            <span className="file-tree-name" onClick={handleClick}>{entry.name}</span>
+            <span className="file-tree-drag-handle" {...listeners}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <circle cx="3" cy="3" r="1.5"/>
+                <circle cx="9" cy="3" r="1.5"/>
+                <circle cx="3" cy="9" r="1.5"/>
+                <circle cx="9" cy="9" r="1.5"/>
+              </svg>
+            </span>
           </>
         )}
       </div>
@@ -248,6 +288,7 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
               onCreateFolder={onCreateFolder}
               onRename={onRename}
               onDelete={onDelete}
+              onMove={onMove}
             />
           ))}
         </div>
@@ -263,7 +304,8 @@ const FileTree: FC<FileTreeProps> = ({
   onCreateFile,
   onCreateFolder,
   onRename,
-  onDelete
+  onDelete,
+  onMove
 }) => {
   if (entries.length === 0) {
     return (
@@ -286,6 +328,7 @@ const FileTree: FC<FileTreeProps> = ({
           onCreateFolder={onCreateFolder}
           onRename={onRename}
           onDelete={onDelete}
+          onMove={onMove}
         />
       ))}
     </div>

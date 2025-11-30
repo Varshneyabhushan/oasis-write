@@ -136,6 +136,45 @@ fn rename_folder(old_path: String, new_path: String) -> Result<(), String> {
         .map_err(|e| format!("Failed to rename folder: {}", e))
 }
 
+// Move a file or folder to a target directory
+#[tauri::command]
+fn move_item(source_path: String, target_dir: String) -> Result<(), String> {
+    let source = PathBuf::from(&source_path);
+    let target_directory = PathBuf::from(&target_dir);
+
+    // Validate source exists
+    if !source.exists() {
+        return Err(format!("Source does not exist: {}", source_path));
+    }
+
+    // Validate target is a directory
+    if !target_directory.is_dir() {
+        return Err(format!("Target is not a directory: {}", target_dir));
+    }
+
+    // Get the filename from source
+    let file_name = source
+        .file_name()
+        .ok_or_else(|| "Failed to get filename from source path".to_string())?;
+
+    // Create the new path in target directory
+    let new_path = target_directory.join(file_name);
+
+    // Check if an item with the same name already exists in target
+    if new_path.exists() {
+        return Err(format!(
+            "An item with the name '{}' already exists in the target directory",
+            file_name.to_string_lossy()
+        ));
+    }
+
+    // Move the item
+    fs::rename(&source, &new_path)
+        .map_err(|e| format!("Failed to move item: {}", e))?;
+
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -152,6 +191,7 @@ pub fn run() {
             create_folder,
             delete_folder,
             rename_folder,
+            move_item,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

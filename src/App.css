@@ -98,6 +98,12 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 0.5rem;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.sidebar-content.root-drag-over {
+  background-color: rgba(93, 173, 226, 0.08);
 }
 
 .sidebar-content::-webkit-scrollbar {

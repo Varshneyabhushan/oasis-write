@@ -1,10 +1,134 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
+import { DndContext, useDroppable, DragEndEvent, DragOverlay, DragStartEvent, rectIntersection, CollisionDetection, pointerWithin, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import FileTree, { FileEntry } from './FileTree';
 import Outline from './Outline';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 import InlineInput from './InlineInput';
 
 export type SidebarView = 'files' | 'outline';
+
+// Separate component for droppable content that must be inside DndContext
+interface DroppableContentProps {
+  folderPath: string;
+  folderName: string;
+  currentView: SidebarView;
+  rootCreating: 'file' | 'folder' | null;
+  files: FileEntry[];
+  selectedFile?: string;
+  fileContent?: string;
+  contextMenu: { x: number; y: number } | null;
+  onFileSelect: (path: string) => void;
+  onCreateFile: (parentPath: string, fileName: string) => Promise<void>;
+  onCreateFolder: (parentPath: string, folderName: string) => Promise<void>;
+  onRename: (oldPath: string, newName: string) => Promise<void>;
+  onDelete: (path: string, isDirectory: boolean) => Promise<void>;
+  onMove: (sourcePath: string, targetDir: string, isDirectory: boolean) => Promise<void>;
+  handleSidebarContextMenu: (e: React.MouseEvent) => void;
+  getRootContextMenuItems: () => ContextMenuItem[];
+  validateRootFileName: (name: string, isFile: boolean) => string | null;
+  handleRootCreateConfirm: (name: string) => Promise<void>;
+  setContextMenu: (menu: { x: number; y: number } | null) => void;
+  setRootCreating: (creating: 'file' | 'folder' | null) => void;
+}
+
+const DroppableContent: FC<DroppableContentProps> = ({
+  folderPath,
+  folderName,
+  currentView,
+  rootCreating,
+  files,
+  selectedFile,
+  fileContent,
+  contextMenu,
+  onFileSelect,
+  onCreateFile,
+  onCreateFolder,
+  onRename,
+  onDelete,
+  onMove,
+  handleSidebarContextMenu,
+  getRootContextMenuItems,
+  validateRootFileName,
+  handleRootCreateConfirm,
+  setContextMenu,
+  setRootCreating,
+}) => {
+  // Root droppable - must be inside DndContext to register properly
+  const { setNodeRef: setRootDropRef, isOver: isRootOver } = useDroppable({
+    id: `root-folder-${folderPath}`,
+    disabled: currentView !== 'files',
+    data: {
+      entry: {
+        path: folderPath || '',
+        is_directory: true,
+        name: folderName,
+      },
+    },
+  });
+
+  return (
+    <div
+      ref={setRootDropRef}
+      className={`sidebar-content ${isRootOver ? 'root-drag-over' : ''}`}
+      onContextMenu={handleSidebarContextMenu}
+    >
+      {currentView === 'files' ? (
+        <>
+          {/* Root-level inline creation */}
+          {rootCreating && (
+            <div
+              className="file-tree-row"
+              style={{ paddingLeft: '8px' }}
+            >
+              {rootCreating === 'folder' ? (
+                <span className="file-tree-arrow">▶</span>
+              ) : (
+                <span className="file-tree-spacer"></span>
+              )}
+              <InlineInput
+                placeholder={rootCreating === 'file' ? 'new-file.md' : 'new-folder'}
+                onConfirm={handleRootCreateConfirm}
+                onCancel={() => setRootCreating(null)}
+                autoFocus
+                validate={(name) => validateRootFileName(name, rootCreating === 'file')}
+              />
+            </div>
+          )}
+
+          {files.length > 0 ? (
+            <FileTree
+              entries={files}
+              onFileSelect={onFileSelect}
+              selectedPath={selectedFile}
+              onCreateFile={onCreateFile}
+              onCreateFolder={onCreateFolder}
+              onRename={onRename}
+              onDelete={onDelete}
+              onMove={onMove}
+            />
+          ) : (
+            <div className="placeholder">
+              No markdown files found
+            </div>
+          )}
+
+          {/* Context menu for root-level creation */}
+          {contextMenu && (
+            <ContextMenu
+              isOpen={true}
+              x={contextMenu.x}
+              y={contextMenu.y}
+              items={getRootContextMenuItems()}
+              onClose={() => setContextMenu(null)}
+            />
+          )}
+        </>
+      ) : (
+        <Outline content={fileContent || ''} />
+      )}
+    </div>
+  );
+};
 
 interface SidebarProps {
   isVisible: boolean;
@@ -19,6 +143,7 @@ interface SidebarProps {
   onCreateFolder: (parentPath: string, folderName: string) => Promise<void>;
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
+  onMove: (sourcePath: string, targetDir: string, isDirectory: boolean) => Promise<void>;
 }
 
 const Sidebar: FC<SidebarProps> = ({
@@ -33,11 +158,103 @@ const Sidebar: FC<SidebarProps> = ({
   onCreateFile,
   onCreateFolder,
   onRename,
-  onDelete
+  onDelete,
+  onMove
 }) => {
   const folderName = folderPath ? folderPath.split('/').pop() || 'Files' : 'Files';
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [rootCreating, setRootCreating] = useState<'file' | 'folder' | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  // Configure sensors for drag and drop
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 8, // 8px of movement required to start drag
+    },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200,
+      tolerance: 5,
+    },
+  });
+  const sensors = useSensors(mouseSensor, touchSensor);
+
+  // Custom collision detection: hierarchical, VSCode-like behavior
+  const customCollisionDetection: CollisionDetection = (args) => {
+    // Use rect intersection for more reliable collision detection
+    const allCollisions = rectIntersection(args);
+
+    // Separate root and folder collisions
+    const rootCollisions = allCollisions.filter(
+      collision => collision.id.toString().startsWith('root-folder-')
+    );
+
+    const folderCollisions = allCollisions.filter(
+      collision => collision.id.toString().startsWith('droppable-')
+    );
+
+    // If we have folder collisions, pick the most specific (deepest) one
+    if (folderCollisions.length > 0) {
+      // Sort by path depth (deepest first) to get most specific folder
+      const sortedFolders = folderCollisions.sort((a, b) => {
+        const pathA = a.id.toString().replace('droppable-', '');
+        const pathB = b.id.toString().replace('droppable-', '');
+        const depthA = pathA.split('/').length;
+        const depthB = pathB.split('/').length;
+        return depthB - depthA; // Deeper paths first
+      });
+
+      // Return only the most specific (deepest) folder
+      return [sortedFolders[0]];
+    }
+
+    // No folder collisions, use root if available
+    if (rootCollisions.length > 0) {
+      return rootCollisions;
+    }
+
+    // No collisions detected
+    return [];
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (!over) {
+      return;
+    }
+
+    const sourceEntry = active.data.current?.entry as FileEntry;
+    const targetEntry = over.data.current?.entry as FileEntry;
+
+    if (!sourceEntry || !targetEntry) {
+      return;
+    }
+
+    // Don't drop on itself
+    if (sourceEntry.path === targetEntry.path) {
+      return;
+    }
+
+    // Don't drop on files, only folders
+    if (!targetEntry.is_directory) {
+      return;
+    }
+
+    // Don't drop a parent folder into its child
+    if (targetEntry.path.startsWith(sourceEntry.path + '/')) {
+      return;
+    }
+
+    // Perform the move
+    onMove(sourceEntry.path, targetEntry.path, sourceEntry.is_directory);
+  };
 
   // Handle context menu on empty sidebar areas (for root-level file/folder creation)
   const handleSidebarContextMenu = (e: React.MouseEvent) => {
@@ -109,9 +326,25 @@ const Sidebar: FC<SidebarProps> = ({
     setRootCreating(null);
   };
 
+  const handleDragOver = (event: any) => {
+    // Only log when over root folder
+    if (event.over?.id && event.over.id.toString().startsWith('root-folder-')) {
+      console.log('[ROOT DRAG OVER]', {
+        activeId: event.active?.id,
+        overId: event.over?.id
+      });
+    }
+  };
+
   return (
     <aside className={`sidebar ${!isVisible ? 'hidden' : ''}`}>
-      <div className="sidebar-header">
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        collisionDetection={customCollisionDetection}
+      >
+        <div className="sidebar-header">
         <div className="sidebar-header-content">
           <div className="sidebar-tabs">
             <button
@@ -138,61 +371,37 @@ const Sidebar: FC<SidebarProps> = ({
           </div>
         </div>
       </div>
-      <div className="sidebar-content" onContextMenu={handleSidebarContextMenu}>
-        {currentView === 'files' ? (
-          <>
-            {/* Root-level inline creation */}
-            {rootCreating && (
-              <div
-                className="file-tree-row"
-                style={{ paddingLeft: '8px' }}
-              >
-                {rootCreating === 'folder' ? (
-                  <span className="file-tree-arrow">▶</span>
-                ) : (
-                  <span className="file-tree-spacer"></span>
-                )}
-                <InlineInput
-                  placeholder={rootCreating === 'file' ? 'new-file.md' : 'new-folder'}
-                  onConfirm={handleRootCreateConfirm}
-                  onCancel={() => setRootCreating(null)}
-                  autoFocus
-                  validate={(name) => validateRootFileName(name, rootCreating === 'file')}
-                />
-              </div>
-            )}
-
-            {files.length > 0 ? (
-              <FileTree
-                entries={files}
-                onFileSelect={onFileSelect}
-                selectedPath={selectedFile}
-                onCreateFile={onCreateFile}
-                onCreateFolder={onCreateFolder}
-                onRename={onRename}
-                onDelete={onDelete}
-              />
-            ) : (
-              <div className="placeholder">
-                No markdown files found
-              </div>
-            )}
-
-            {/* Context menu for root-level creation */}
-            {contextMenu && (
-              <ContextMenu
-                isOpen={true}
-                x={contextMenu.x}
-                y={contextMenu.y}
-                items={getRootContextMenuItems()}
-                onClose={() => setContextMenu(null)}
-              />
-            )}
-          </>
-        ) : (
-          <Outline content={fileContent || ''} />
-        )}
-      </div>
+      <DroppableContent
+        folderPath={folderPath || ''}
+        folderName={folderName}
+        currentView={currentView}
+        rootCreating={rootCreating}
+        files={files}
+        selectedFile={selectedFile}
+        fileContent={fileContent}
+        contextMenu={contextMenu}
+        onFileSelect={onFileSelect}
+        onCreateFile={onCreateFile}
+        onCreateFolder={onCreateFolder}
+        onRename={onRename}
+        onDelete={onDelete}
+        onMove={onMove}
+        handleSidebarContextMenu={handleSidebarContextMenu}
+        getRootContextMenuItems={getRootContextMenuItems}
+        validateRootFileName={validateRootFileName}
+        handleRootCreateConfirm={handleRootCreateConfirm}
+        setContextMenu={setContextMenu}
+        setRootCreating={setRootCreating}
+      />
+      <DragOverlay>
+        {activeId ? (
+          <div className="file-tree-row dragging" style={{ paddingLeft: '8px' }}>
+            <span className="file-tree-spacer"></span>
+            <span className="file-tree-name">{activeId.split('/').pop()}</span>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
     </aside>
   );
 };
