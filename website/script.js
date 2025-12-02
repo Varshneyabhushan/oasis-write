@@ -33,8 +33,8 @@ function getDownloadUrl(assets, platform) {
     const patterns = {
         macos: /\.dmg$/,
         macosAlt: /universal.*\.tar\.gz$/,
-        windows: /\.msi$/,
-        windowsAlt: /\.exe$/,
+        windows: /\.exe$/,
+        windowsAlt: /\.msi$/,
         linux: /\.AppImage$/,
         linuxDeb: /\.deb$/,
         linuxRpm: /\.rpm$/
