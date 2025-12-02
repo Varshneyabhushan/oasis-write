@@ -165,7 +165,11 @@ const Sidebar: FC<SidebarProps> = ({
   onMove,
   onHeadingClick
 }) => {
-  const folderName = folderPath ? folderPath.split('/').pop() || 'Files' : 'Files';
+  // Extract folder name from path - works cross-platform
+  // Regex [\\/] matches both / (Mac/Linux) and \ (Windows)
+  // filter(Boolean) removes empty strings from leading/trailing slashes
+  // pop() gets the last path segment (the folder name)
+  const folderName = folderPath?.split(/[\\/]/).filter(Boolean).pop() ?? 'Files';
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [rootCreating, setRootCreating] = useState<'file' | 'folder' | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
