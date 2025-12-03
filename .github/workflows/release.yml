@@ -54,7 +54,7 @@ jobs:
           - platform: 'ubuntu-22.04'
             args: ''
           - platform: 'windows-latest'
-            args: '--bundles nsis,app'
+            args: ''
 
     runs-on: ${{ matrix.platform }}
     steps:
