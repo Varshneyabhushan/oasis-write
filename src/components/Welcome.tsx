@@ -2,13 +2,26 @@ import { FC, useEffect, useState } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { getVersion } from '@tauri-apps/api/app';
 import packageJson from '../../package.json';
+import { RecentItem } from '../types';
 import './Welcome.css';
+
+const shortenPath = (path: string) => {
+  const parts = path.split(/[/\\]+/).filter(Boolean);
+  if (parts.length <= 2) return path;
+  return `…/${parts.slice(-2).join('/')}`;
+};
 
 interface WelcomeProps {
   onFolderSelected: (path: string) => void;
+  onOpenRecent: (item: RecentItem) => void;
+  recentItems: RecentItem[];
 }
 
-const Welcome: FC<WelcomeProps> = ({ onFolderSelected }) => {
+const Welcome: FC<WelcomeProps> = ({
+  onFolderSelected,
+  onOpenRecent,
+  recentItems,
+}) => {
   const [version, setVersion] = useState<string>(packageJson.version);
 
   useEffect(() => {
@@ -56,10 +69,50 @@ const Welcome: FC<WelcomeProps> = ({ onFolderSelected }) => {
           </button>
         </div>
 
+        <div className="welcome-recent">
+          <div className="welcome-recent-header">
+            <div>
+              <p className="welcome-recent-title">Recent</p>
+            </div>
+          </div>
+
+          {recentItems.length === 0 ? (
+            <p className="welcome-empty">No recent folders yet.</p>
+          ) : (
+            <ul className="welcome-recent-list">
+              {recentItems.map((item) => (
+                <li key={`${item.type}-${item.path}`} className="welcome-recent-row">
+                  <button
+                    className="recent-entry"
+                    onClick={() => onOpenRecent(item)}
+                    title={item.path}
+                  >
+                    <span className={`recent-icon ${item.type}`} aria-hidden="true">
+                      {item.type === 'folder' ? (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M3 5h6l2 2h10v10a2 2 0 0 1-2 2H3z" />
+                          <path d="M3 5h6l2 2h10" />
+                        </svg>
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M7 3h7l5 5v13H7z" />
+                          <path d="M14 3v5h5" />
+                        </svg>
+                      )}
+                    </span>
+                    <div className="recent-text">
+                      <span className="recent-name">{item.name}</span>
+                      <span className="recent-path">{shortenPath(item.path)}</span>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <div className="welcome-footer">
-          <p className="welcome-hint">
-            Select a folder containing markdown files to get started
-          </p>
+          <p className="welcome-hint">Open a folder to start writing.</p>
           <p className="welcome-version">Version {version}</p>
         </div>
       </div>

@@ -6,7 +6,55 @@ import Sidebar, { SidebarView } from "./components/Sidebar";
 import Editor from "./components/Editor";
 import { FileEntry } from "./components/FileTree";
 import ConfirmDialog from "./components/ConfirmDialog";
+import { RecentItem } from "./types";
 import "./App.css";
+
+const RECENT_ITEMS_STORAGE_KEY = 'oasis-write-recent-items';
+const RECENT_LIMIT = 3;
+
+const getBaseName = (path: string) => {
+  const normalizedPath = path.trim();
+  const lastSeparatorIndex = Math.max(
+    normalizedPath.lastIndexOf('/'),
+    normalizedPath.lastIndexOf('\\'),
+  );
+  if (lastSeparatorIndex === -1) return normalizedPath;
+  return normalizedPath.substring(lastSeparatorIndex + 1);
+};
+
+const getParentDirectory = (path: string) => {
+  const normalizedPath = path.trim();
+  const lastSeparatorIndex = Math.max(
+    normalizedPath.lastIndexOf('/'),
+    normalizedPath.lastIndexOf('\\'),
+  );
+  if (lastSeparatorIndex === -1) return '';
+  return normalizedPath.substring(0, lastSeparatorIndex);
+};
+
+const loadStoredRecentItems = (): RecentItem[] => {
+  try {
+    const stored = localStorage.getItem(RECENT_ITEMS_STORAGE_KEY);
+    if (!stored) return [];
+
+    const parsed = JSON.parse(stored) as RecentItem[];
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .filter((item) => item && typeof item.path === 'string' && item.type === 'folder')
+      .map((item) => ({
+        ...item,
+        name: item.name || getBaseName(item.path),
+        parentPath: item.parentPath || getParentDirectory(item.path),
+        lastOpened: item.lastOpened || Date.now(),
+      }))
+      .sort((a, b) => (b.lastOpened || 0) - (a.lastOpened || 0))
+      .slice(0, RECENT_LIMIT);
+  } catch (error) {
+    console.error('Failed to load recent items:', error);
+    return [];
+  }
+};
 
 function App() {
   const [folderPath, setFolderPath] = useState<string | null>(null);
@@ -16,6 +64,7 @@ function App() {
   const [originalContent, setOriginalContent] = useState<string>("");
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
+  const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [sidebarView, setSidebarView] = useState<SidebarView>('files');
@@ -38,6 +87,35 @@ function App() {
 
   const decreaseFontSize = useCallback(() => {
     setFontSize(prev => Math.max(prev - 2, 10)); // Min 10px
+  }, []);
+
+  const addRecentItem = useCallback((path: string, type: RecentItem['type']) => {
+    if (type === 'file') {
+      return;
+    }
+    const now = Date.now();
+    const name = getBaseName(path);
+    const parentPath = getParentDirectory(path);
+
+    setRecentItems(prevItems => {
+      const filtered = prevItems.filter(item => item.path !== path);
+      const updated: RecentItem[] = [
+        { path, type, name, lastOpened: now, parentPath },
+        ...filtered,
+      ].slice(0, RECENT_LIMIT);
+
+      try {
+        localStorage.setItem(RECENT_ITEMS_STORAGE_KEY, JSON.stringify(updated));
+      } catch (error) {
+        console.error('Failed to persist recent items:', error);
+      }
+
+      return updated;
+    });
+  }, []);
+
+  useEffect(() => {
+    setRecentItems(loadStoredRecentItems());
   }, []);
 
   // Load folder contents
@@ -86,7 +164,9 @@ function App() {
 
   // Handle folder selection from Welcome screen
   const handleFolderSelected = (path: string) => {
+    setFolderPath(path);
     loadFolder(path);
+    addRecentItem(path, 'folder');
   };
 
   // Handle file selection from sidebar
@@ -97,6 +177,15 @@ function App() {
     }
     loadFile(path);
   };
+
+  const handleOpenRecent = useCallback((item: RecentItem) => {
+    if (item.type !== 'folder') {
+      return;
+    }
+    setFolderPath(item.path);
+    loadFolder(item.path);
+    addRecentItem(item.path, 'folder');
+  }, [addRecentItem, loadFolder]);
 
   // Handle content change in editor
   const handleContentChange = (content: string) => {
@@ -371,7 +460,13 @@ function App() {
 
   // Show welcome screen if no folder is opened
   if (!folderPath) {
-    return <Welcome onFolderSelected={handleFolderSelected} />;
+    return (
+      <Welcome
+        onFolderSelected={handleFolderSelected}
+        recentItems={recentItems}
+        onOpenRecent={handleOpenRecent}
+      />
+    );
   }
 
   return (
