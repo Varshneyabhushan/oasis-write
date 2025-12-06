@@ -33,16 +33,16 @@
       <stop offset="100%" stop-color="black" stop-opacity="0.2" />
     </radialGradient>
 
-    <!-- Rounded-square mask for the full canvas -->
+    <!-- Rounded-square mask with ~75% footprint and padding -->
     <mask id="shapeMask">
-      <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="white"/>
+      <rect x="64" y="64" width="384" height="384" rx="76" ry="76" fill="white"/>
     </mask>
   </defs>
 
   <!-- Icon artwork with natural transparent padding -->
   <g>
-    <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#mainGradient)"/>
-    <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#keyboardPattern)"/>
+    <rect x="64" y="64" width="384" height="384" rx="76" ry="76" fill="url(#mainGradient)"/>
+    <rect x="64" y="64" width="384" height="384" rx="76" ry="76" fill="url(#keyboardPattern)"/>
 
     <!-- Curved wave layers constrained to the square -->
     <path d="M 0 256 Q 128 200 256 256 T 512 256 L 512 512 L 0 512 Z"
@@ -54,7 +54,7 @@
           mask="url(#shapeMask)"/>
 
     <!-- Foreground motif scaled inside the square -->
-    <g transform="translate(256 256) scale(0.82) translate(-256 -256)">
+    <g transform="translate(256 256) scale(0.78) translate(-256 -256)">
       <g transform="translate(256, 200)">
         <rect x="-4" y="-50" width="8" height="100" rx="2" fill="url(#cursorGradient)"/>
         <rect x="-18" y="-50" width="36" height="8" rx="2" fill="url(#cursorGradient)"/>
@@ -84,6 +84,6 @@
       </g>
     </g>
 
-    <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#vignette)"/>
+    <rect x="64" y="64" width="384" height="384" rx="76" ry="76" fill="url(#vignette)"/>
   </g>
 </svg>
