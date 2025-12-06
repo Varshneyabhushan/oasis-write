@@ -255,7 +255,7 @@ fn copy_dir_all(src: &PathBuf, dst: &PathBuf) -> std::io::Result<()> {
 }
 
 // Helper function to create a new window
-fn create_new_window(app_handle: &tauri::AppHandle) {
+fn spawn_new_window(app_handle: &tauri::AppHandle) -> Result<(), String> {
     use tauri::webview::WebviewWindowBuilder;
 
     // Generate unique label using timestamp
@@ -266,7 +266,7 @@ fn create_new_window(app_handle: &tauri::AppHandle) {
     let label = format!("oasis-write-{}", timestamp);
 
     // Create new window with same config as main window
-    let _window = WebviewWindowBuilder::new(
+    WebviewWindowBuilder::new(
         app_handle,
         &label,
         tauri::WebviewUrl::App("index.html".into())
@@ -275,7 +275,15 @@ fn create_new_window(app_handle: &tauri::AppHandle) {
     .inner_size(1200.0, 800.0)
     .min_inner_size(800.0, 600.0)
     .focused(true)
-    .build();
+    .build()
+    .map(|_| ())
+    .map_err(|e| format!("Failed to create new window: {}", e))
+}
+
+// Command to create a new window so it can be triggered from the frontend shortcut
+#[tauri::command]
+fn create_new_window(app_handle: tauri::AppHandle) -> Result<(), String> {
+    spawn_new_window(&app_handle)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -329,7 +337,9 @@ pub fn run() {
             // Handle menu events (both clicks and keyboard shortcuts)
             app.on_menu_event(move |app_handle, event| {
                 if event.id().as_ref() == "new_window" {
-                    create_new_window(app_handle);
+                    if let Err(err) = spawn_new_window(app_handle) {
+                        eprintln!("Failed to create new window from menu: {}", err);
+                    }
                 }
             });
 
@@ -347,6 +357,7 @@ pub fn run() {
             rename_folder,
             move_item,
             duplicate_item,
+            create_new_window,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

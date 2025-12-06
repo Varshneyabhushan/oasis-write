@@ -90,6 +90,12 @@ function App() {
 
   const [editorInstance, setEditorInstance] = useState<TipTapEditorType | null>(null);
 
+  const handleNewWindowShortcut = useCallback(() => {
+    invoke("create_new_window").catch((error) => {
+      console.error("Failed to create new window:", error);
+    });
+  }, []);
+
   // Helper to check if a path is a directory
   const isPathDirectory = useCallback((path: string): boolean => {
     const checkInFiles = (entries: FileEntry[]): boolean => {
@@ -448,13 +454,18 @@ function App() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent Cmd/Ctrl + N (handled by native menu)
-      if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+      const key = e.key.toLowerCase();
+
+      // Cmd/Ctrl + N to open a new window
+      if ((e.metaKey || e.ctrlKey) && key === 'n' && !e.shiftKey && !e.altKey) {
         e.preventDefault();
+        if (!e.repeat) {
+          handleNewWindowShortcut();
+        }
         return;
       }
       // Cmd/Ctrl + X to cut
-      if ((e.metaKey || e.ctrlKey) && e.key === 'x' && selectedFile && !e.shiftKey && !e.altKey) {
+      if ((e.metaKey || e.ctrlKey) && key === 'x' && selectedFile && !e.shiftKey && !e.altKey) {
         e.preventDefault();
         const isDirectory = isPathDirectory(selectedFile);
         const name = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
@@ -462,7 +473,7 @@ function App() {
         return;
       }
       // Cmd/Ctrl + C to copy
-      if ((e.metaKey || e.ctrlKey) && e.key === 'c' && selectedFile && !e.shiftKey && !e.altKey) {
+      if ((e.metaKey || e.ctrlKey) && key === 'c' && selectedFile && !e.shiftKey && !e.altKey) {
         e.preventDefault();
         const isDirectory = isPathDirectory(selectedFile);
         const name = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
@@ -470,7 +481,7 @@ function App() {
         return;
       }
       // Cmd/Ctrl + V to paste
-      if ((e.metaKey || e.ctrlKey) && e.key === 'v' && clipboard && !e.shiftKey && !e.altKey) {
+      if ((e.metaKey || e.ctrlKey) && key === 'v' && clipboard && !e.shiftKey && !e.altKey) {
         e.preventDefault();
         // Determine target directory
         let targetDir = folderPath;
@@ -490,12 +501,12 @@ function App() {
         return;
       }
       // Cmd/Ctrl + S to save
-      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      if ((e.metaKey || e.ctrlKey) && key === 's') {
         e.preventDefault();
         saveFile();
       }
       // Cmd/Ctrl + 1 to toggle file explorer
-      if ((e.metaKey || e.ctrlKey) && e.key === '1') {
+      if ((e.metaKey || e.ctrlKey) && key === '1') {
         e.preventDefault();
         // If sidebar is visible AND already showing files view, hide it (zen mode)
         if (sidebarVisible && sidebarView === 'files') {
@@ -519,7 +530,7 @@ function App() {
         }
       }
       // Cmd/Ctrl + = or Cmd/Ctrl + + to increase font size
-      if ((e.metaKey || e.ctrlKey) && (e.key === '=' || e.key === '+')) {
+      if ((e.metaKey || e.ctrlKey) && (key === '=' || key === '+')) {
         e.preventDefault();
         e.stopPropagation();
         console.log('Increasing font size');
@@ -527,7 +538,7 @@ function App() {
         return false;
       }
       // Cmd/Ctrl + - to decrease font size
-      if ((e.metaKey || e.ctrlKey) && e.key === '-') {
+      if ((e.metaKey || e.ctrlKey) && key === '-') {
         e.preventDefault();
         e.stopPropagation();
         console.log('Decreasing font size');
@@ -538,7 +549,7 @@ function App() {
 
     document.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => document.removeEventListener('keydown', handleKeyDown, { capture: true });
-  }, [saveFile, sidebarVisible, sidebarView, increaseFontSize, decreaseFontSize, selectedFile, clipboard, folderPath, isPathDirectory, handleCut, handleCopy, handlePaste]);
+  }, [saveFile, sidebarVisible, sidebarView, increaseFontSize, decreaseFontSize, selectedFile, clipboard, folderPath, isPathDirectory, handleCut, handleCopy, handlePaste, handleNewWindowShortcut]);
 
   // Handler for sidebar view change
   const handleViewChange = (view: SidebarView) => {
