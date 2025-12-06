@@ -62,6 +62,25 @@
   pointer-events: none;
 }
 
+.file-tree-row.cut {
+  opacity: 0.5;
+  filter: saturate(0.3);
+  position: relative;
+}
+
+.file-tree-row.cut::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px dashed var(--accent-color);
+  pointer-events: none;
+  opacity: 0.5;
+  border-radius: 0.1875rem;
+}
+
 .file-tree-arrow {
   display: inline-flex;
   align-items: center;

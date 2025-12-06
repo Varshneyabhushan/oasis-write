@@ -177,6 +177,83 @@ fn move_item(source_path: String, target_dir: String) -> Result<(), String> {
     Ok(())
 }
 
+// Duplicate a file or folder to a target directory
+#[tauri::command]
+fn duplicate_item(source_path: String, target_dir: String) -> Result<(), String> {
+    let source = PathBuf::from(&source_path);
+    let target_directory = PathBuf::from(&target_dir);
+
+    // Validate source exists
+    if !source.exists() {
+        return Err(format!("Source does not exist: {}", source_path));
+    }
+
+    // Validate target is directory
+    if !target_directory.is_dir() {
+        return Err(format!("Target is not a directory: {}", target_dir));
+    }
+
+    // Get filename and create target path
+    let file_name = source
+        .file_name()
+        .ok_or_else(|| "Failed to get filename".to_string())?;
+    let mut target_path = target_directory.join(file_name);
+
+    // Handle name conflicts by appending " copy", " copy 2", etc.
+    let mut counter = 1;
+    while target_path.exists() {
+        let base_name = source.file_stem()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| "Failed to get base name".to_string())?;
+        let extension = source.extension()
+            .and_then(|s| s.to_str())
+            .unwrap_or("");
+
+        let new_name = if counter == 1 {
+            if extension.is_empty() {
+                format!("{} copy", base_name)
+            } else {
+                format!("{} copy.{}", base_name, extension)
+            }
+        } else {
+            if extension.is_empty() {
+                format!("{} copy {}", base_name, counter)
+            } else {
+                format!("{} copy {}.{}", base_name, counter, extension)
+            }
+        };
+
+        target_path = target_directory.join(new_name);
+        counter += 1;
+    }
+
+    // Copy file or directory
+    if source.is_dir() {
+        copy_dir_all(&source, &target_path)
+            .map_err(|e| format!("Failed to copy directory: {}", e))?;
+    } else {
+        fs::copy(&source, &target_path)
+            .map_err(|e| format!("Failed to copy file: {}", e))?;
+    }
+
+    Ok(())
+}
+
+// Helper function to recursively copy directories
+fn copy_dir_all(src: &PathBuf, dst: &PathBuf) -> std::io::Result<()> {
+    fs::create_dir_all(dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let ty = entry.file_type()?;
+        if ty.is_dir() {
+            copy_dir_all(&entry.path(), &dst.join(entry.file_name()))?;
+        } else {
+            fs::copy(entry.path(), dst.join(entry.file_name()))?;
+        }
+    }
+    Ok(())
+}
+
 // Helper function to create a new window
 fn create_new_window(app_handle: &tauri::AppHandle) {
     use tauri::webview::WebviewWindowBuilder;
@@ -269,6 +346,7 @@ pub fn run() {
             delete_folder,
             rename_folder,
             move_item,
+            duplicate_item,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

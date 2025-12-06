@@ -12,6 +12,13 @@ import "./App.css";
 const RECENT_ITEMS_STORAGE_KEY = 'oasis-write-recent-items';
 const RECENT_LIMIT = 3;
 
+interface ClipboardItem {
+  path: string;
+  name: string;
+  isDirectory: boolean;
+  operation: 'cut' | 'copy';
+}
+
 const getBaseName = (path: string) => {
   const normalizedPath = path.trim();
   const lastSeparatorIndex = Math.max(
@@ -79,7 +86,26 @@ function App() {
     isDirectory: boolean;
   } | null>(null);
 
+  const [clipboard, setClipboard] = useState<ClipboardItem | null>(null);
+
   const [editorInstance, setEditorInstance] = useState<TipTapEditorType | null>(null);
+
+  // Helper to check if a path is a directory
+  const isPathDirectory = useCallback((path: string): boolean => {
+    const checkInFiles = (entries: FileEntry[]): boolean => {
+      for (const entry of entries) {
+        if (entry.path === path) {
+          return entry.is_directory;
+        }
+        if (entry.children) {
+          const found = checkInFiles(entry.children);
+          if (found !== undefined) return found;
+        }
+      }
+      return false;
+    };
+    return checkInFiles(files);
+  }, [files]);
 
   // Font size adjustment handlers
   const increaseFontSize = useCallback(() => {
@@ -318,6 +344,51 @@ function App() {
     }
   }, [folderPath, selectedFile, loadFolder]);
 
+  // Cut operation - mark item for moving
+  const handleCut = useCallback((path: string, name: string, isDirectory: boolean) => {
+    setClipboard({ path, name, isDirectory, operation: 'cut' });
+  }, []);
+
+  // Copy operation - mark item for duplicating
+  const handleCopy = useCallback((path: string, name: string, isDirectory: boolean) => {
+    setClipboard({ path, name, isDirectory, operation: 'copy' });
+  }, []);
+
+  // Duplicate item (for copy operation)
+  const handleDuplicate = useCallback(async (sourcePath: string, targetDir: string) => {
+    try {
+      await invoke("duplicate_item", { sourcePath, targetDir });
+
+      // Reload directory to show the duplicate
+      if (folderPath) {
+        await loadFolder(folderPath);
+      }
+    } catch (error) {
+      console.error("Failed to duplicate:", error);
+      alert(`Failed to duplicate: ${error}`);
+    }
+  }, [folderPath, loadFolder]);
+
+  // Paste operation - move or duplicate based on clipboard operation
+  const handlePaste = useCallback(async (targetDir: string) => {
+    if (!clipboard) return;
+
+    try {
+      if (clipboard.operation === 'cut') {
+        // Move operation (reuse existing handleMove logic)
+        await handleMove(clipboard.path, targetDir, clipboard.isDirectory);
+        setClipboard(null); // Clear clipboard after cut-paste
+      } else {
+        // Copy operation (duplicate the item)
+        await handleDuplicate(clipboard.path, targetDir);
+        // Don't clear clipboard - can paste multiple times
+      }
+    } catch (error) {
+      console.error("Failed to paste:", error);
+      alert(`Failed to paste: ${error}`);
+    }
+  }, [clipboard, handleMove, handleDuplicate]);
+
   // Confirm delete operation
   const handleConfirmDelete = useCallback(async () => {
     if (!deleteConfirmation) return;
@@ -382,6 +453,42 @@ function App() {
         e.preventDefault();
         return;
       }
+      // Cmd/Ctrl + X to cut
+      if ((e.metaKey || e.ctrlKey) && e.key === 'x' && selectedFile && !e.shiftKey && !e.altKey) {
+        e.preventDefault();
+        const isDirectory = isPathDirectory(selectedFile);
+        const name = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
+        handleCut(selectedFile, name, isDirectory);
+        return;
+      }
+      // Cmd/Ctrl + C to copy
+      if ((e.metaKey || e.ctrlKey) && e.key === 'c' && selectedFile && !e.shiftKey && !e.altKey) {
+        e.preventDefault();
+        const isDirectory = isPathDirectory(selectedFile);
+        const name = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
+        handleCopy(selectedFile, name, isDirectory);
+        return;
+      }
+      // Cmd/Ctrl + V to paste
+      if ((e.metaKey || e.ctrlKey) && e.key === 'v' && clipboard && !e.shiftKey && !e.altKey) {
+        e.preventDefault();
+        // Determine target directory
+        let targetDir = folderPath;
+        if (selectedFile) {
+          const isDirectory = isPathDirectory(selectedFile);
+          if (isDirectory) {
+            // Paste into the selected directory
+            targetDir = selectedFile;
+          } else {
+            // Paste into parent of selected file
+            targetDir = selectedFile.substring(0, selectedFile.lastIndexOf('/'));
+          }
+        }
+        if (targetDir) {
+          handlePaste(targetDir);
+        }
+        return;
+      }
       // Cmd/Ctrl + S to save
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
         e.preventDefault();
@@ -431,7 +538,7 @@ function App() {
 
     document.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => document.removeEventListener('keydown', handleKeyDown, { capture: true });
-  }, [saveFile, sidebarVisible, sidebarView, increaseFontSize, decreaseFontSize]);
+  }, [saveFile, sidebarVisible, sidebarView, increaseFontSize, decreaseFontSize, selectedFile, clipboard, folderPath, isPathDirectory, handleCut, handleCopy, handlePaste]);
 
   // Handler for sidebar view change
   const handleViewChange = (view: SidebarView) => {
@@ -492,6 +599,10 @@ function App() {
         onRename={handleRename}
         onDelete={handleDelete}
         onMove={handleMove}
+        clipboard={clipboard}
+        onCut={handleCut}
+        onCopy={handleCopy}
+        onPaste={handlePaste}
         onHeadingClick={scrollToHeading}
         outlineHeadings={outlineHeadings}
       />

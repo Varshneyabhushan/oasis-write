@@ -8,6 +8,13 @@ import type { OutlineHeading } from '../types';
 
 export type SidebarView = 'files' | 'outline';
 
+interface ClipboardItem {
+  path: string;
+  name: string;
+  isDirectory: boolean;
+  operation: 'cut' | 'copy';
+}
+
 // Separate component for droppable content that must be inside DndContext
 interface DroppableContentProps {
   folderPath: string;
@@ -25,6 +32,10 @@ interface DroppableContentProps {
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
   onMove: (sourcePath: string, targetDir: string, isDirectory: boolean) => Promise<void>;
+  clipboard: ClipboardItem | null;
+  onCut: (path: string, name: string, isDirectory: boolean) => void;
+  onCopy: (path: string, name: string, isDirectory: boolean) => void;
+  onPaste: (targetDir: string) => Promise<void>;
   onHeadingClick?: (text: string, level: number) => void;
   handleSidebarContextMenu: (e: React.MouseEvent) => void;
   getRootContextMenuItems: () => ContextMenuItem[];
@@ -50,6 +61,10 @@ const DroppableContent: FC<DroppableContentProps> = ({
   onRename,
   onDelete,
   onMove,
+  clipboard,
+  onCut,
+  onCopy,
+  onPaste,
   onHeadingClick,
   handleSidebarContextMenu,
   getRootContextMenuItems,
@@ -110,6 +125,10 @@ const DroppableContent: FC<DroppableContentProps> = ({
               onRename={onRename}
               onDelete={onDelete}
               onMove={onMove}
+              clipboard={clipboard}
+              onCut={onCut}
+              onCopy={onCopy}
+              onPaste={onPaste}
             />
           ) : (
             <div className="placeholder">
@@ -153,6 +172,10 @@ interface SidebarProps {
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
   onMove: (sourcePath: string, targetDir: string, isDirectory: boolean) => Promise<void>;
+  clipboard: ClipboardItem | null;
+  onCut: (path: string, name: string, isDirectory: boolean) => void;
+  onCopy: (path: string, name: string, isDirectory: boolean) => void;
+  onPaste: (targetDir: string) => Promise<void>;
   onHeadingClick?: (text: string, level: number) => void;
   outlineHeadings?: OutlineHeading[];
 }
@@ -171,6 +194,10 @@ const Sidebar: FC<SidebarProps> = ({
   onRename,
   onDelete,
   onMove,
+  clipboard,
+  onCut,
+  onCopy,
+  onPaste,
   onHeadingClick,
   outlineHeadings
 }) => {
@@ -400,6 +427,10 @@ const Sidebar: FC<SidebarProps> = ({
         onRename={onRename}
         onDelete={onDelete}
         onMove={onMove}
+        clipboard={clipboard}
+        onCut={onCut}
+        onCopy={onCopy}
+        onPaste={onPaste}
         onHeadingClick={onHeadingClick}
         handleSidebarContextMenu={handleSidebarContextMenu}
         getRootContextMenuItems={getRootContextMenuItems}

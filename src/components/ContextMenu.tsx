@@ -2,10 +2,10 @@ import { FC, useEffect, useRef, ReactNode } from 'react';
 import './ContextMenu.css';
 
 export interface ContextMenuItem {
-  label: string;
+  label?: string;
   icon?: ReactNode;
   shortcut?: string;
-  onClick: () => void;
+  onClick?: () => void;
   separator?: boolean;
   disabled?: boolean;
   danger?: boolean;
@@ -93,7 +93,7 @@ const ContextMenu: FC<ContextMenuProps> = ({ isOpen, x, y, items, onClose }) => 
             key={index}
             className={`context-menu-item ${item.disabled ? 'disabled' : ''} ${item.danger ? 'danger' : ''}`}
             onClick={() => {
-              if (!item.disabled) {
+              if (!item.disabled && item.onClick) {
                 item.onClick();
                 onClose();
               }

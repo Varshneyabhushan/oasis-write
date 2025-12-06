@@ -11,6 +11,13 @@ export interface FileEntry {
   children?: FileEntry[];
 }
 
+interface ClipboardItem {
+  path: string;
+  name: string;
+  isDirectory: boolean;
+  operation: 'cut' | 'copy';
+}
+
 interface FileTreeProps {
   entries: FileEntry[];
   onFileSelect: (path: string) => void;
@@ -20,6 +27,10 @@ interface FileTreeProps {
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
   onMove: (sourcePath: string, targetPath: string, isDirectory: boolean) => Promise<void>;
+  clipboard: ClipboardItem | null;
+  onCut: (path: string, name: string, isDirectory: boolean) => void;
+  onCopy: (path: string, name: string, isDirectory: boolean) => void;
+  onPaste: (targetDir: string) => Promise<void>;
 }
 
 interface FileTreeItemProps {
@@ -32,6 +43,10 @@ interface FileTreeItemProps {
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
   onMove: (sourcePath: string, targetPath: string, isDirectory: boolean) => Promise<void>;
+  clipboard: ClipboardItem | null;
+  onCut: (path: string, name: string, isDirectory: boolean) => void;
+  onCopy: (path: string, name: string, isDirectory: boolean) => void;
+  onPaste: (targetDir: string) => Promise<void>;
 }
 
 const FileTreeItem: FC<FileTreeItemProps> = ({
@@ -43,7 +58,11 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
   onCreateFolder,
   onRename,
   onDelete,
-  onMove
+  onMove,
+  clipboard,
+  onCut,
+  onCopy,
+  onPaste
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
@@ -155,8 +174,31 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
     setIsRenaming(false);
   };
 
+  // Handle cut
+  const handleCut = () => {
+    onCut(entry.path, entry.name, entry.is_directory);
+    setContextMenu(null);
+  };
+
+  // Handle copy
+  const handleCopy = () => {
+    onCopy(entry.path, entry.name, entry.is_directory);
+    setContextMenu(null);
+  };
+
+  // Handle paste
+  const handlePaste = async () => {
+    if (entry.is_directory) {
+      await onPaste(entry.path);
+    }
+    setContextMenu(null);
+  };
+
   // Get context menu items based on entry type
   const getContextMenuItems = (): ContextMenuItem[] => {
+    const isMac = navigator.userAgent.includes('Mac');
+    const modKey = isMac ? '⌘' : 'Ctrl+';
+
     if (entry.is_directory) {
       return [
         {
@@ -168,6 +210,22 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
           label: 'New Folder',
           shortcut: 'Shift+N',
           onClick: handleNewFolder,
+        },
+        {
+          label: 'Cut',
+          shortcut: `${modKey}X`,
+          onClick: handleCut,
+        },
+        {
+          label: 'Copy',
+          shortcut: `${modKey}C`,
+          onClick: handleCopy,
+        },
+        {
+          label: 'Paste',
+          shortcut: `${modKey}V`,
+          onClick: handlePaste,
+          disabled: !clipboard,
         },
         {
           label: 'Rename',
@@ -183,6 +241,16 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
     } else {
       return [
         {
+          label: 'Cut',
+          shortcut: `${modKey}X`,
+          onClick: handleCut,
+        },
+        {
+          label: 'Copy',
+          shortcut: `${modKey}C`,
+          onClick: handleCopy,
+        },
+        {
           label: 'Rename',
           shortcut: 'F2',
           onClick: handleRenameClick,
@@ -196,7 +264,10 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
     }
   };
 
-  const rowClasses = `file-tree-row ${isSelected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`;
+  // Check if this item is cut
+  const isCut = clipboard?.path === entry.path && clipboard?.operation === 'cut';
+
+  const rowClasses = `file-tree-row ${isSelected ? 'selected' : ''} ${isDragging ? 'dragging' : ''} ${isCut ? 'cut' : ''}`;
   const itemClasses = `file-tree-item ${isOver && entry.is_directory ? 'drag-over' : ''}`;
 
   return (
@@ -289,6 +360,10 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
               onRename={onRename}
               onDelete={onDelete}
               onMove={onMove}
+              clipboard={clipboard}
+              onCut={onCut}
+              onCopy={onCopy}
+              onPaste={onPaste}
             />
           ))}
         </div>
@@ -305,7 +380,11 @@ const FileTree: FC<FileTreeProps> = ({
   onCreateFolder,
   onRename,
   onDelete,
-  onMove
+  onMove,
+  clipboard,
+  onCut,
+  onCopy,
+  onPaste
 }) => {
   if (entries.length === 0) {
     return (
@@ -329,6 +408,10 @@ const FileTree: FC<FileTreeProps> = ({
           onRename={onRename}
           onDelete={onDelete}
           onMove={onMove}
+          clipboard={clipboard}
+          onCut={onCut}
+          onCopy={onCopy}
+          onPaste={onPaste}
         />
       ))}
     </div>
