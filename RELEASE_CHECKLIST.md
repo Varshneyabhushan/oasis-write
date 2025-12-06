@@ -1,185 +1,38 @@
-# Release Checklist
+# How to Release a New Version to GitHub
 
-Use this checklist when preparing a new release of Oasis Write.
+Follow these steps to publish a new Oasis Write release using the GitHub Actions release workflow.
 
-## Pre-Release
+1) **Prereqs**
+   - Ensure `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` all have the new version (semver, e.g. 0.4.0).
+   - Update `CHANGELOG.md` with the release notes.
+   - Build locally if you want a sanity check: `npm run build` (Node 20+) or `npm run tauri build`.
 
-### Code Preparation
-- [ ] All features for this release are complete
-- [ ] All tests pass
-- [ ] Code has been reviewed
-- [ ] No console warnings or errors
-- [ ] Dependencies are up to date (`npm audit`)
+2) **Commit and Tag**
+   ```bash
+   git status          # clean workspace
+   git add .
+   git commit -m "Release vX.Y.Z"
+   git tag -a vX.Y.Z -m "Release vX.Y.Z"
+   git push origin master
+   git push origin vX.Y.Z
+   ```
 
-### Documentation
-- [ ] README.md is up to date
-- [ ] FEATURES.md reflects current state
-- [ ] CHANGELOG.md has entries for this version
-- [ ] Code comments are clear and helpful
+3) **Trigger CI Release**
+   - Pushing the tag starts the `Release` workflow automatically (or run it manually via “Run workflow” on GitHub with the tag ref).
+   - The workflow uses Node 20, runs `npm ci`, builds the Tauri bundles for macOS, Windows, and Linux, and drafts a GitHub release with attached artifacts.
 
-### Version Bumping
-- [ ] Update version in `package.json`
-- [ ] Update version in `src-tauri/tauri.conf.json`
-- [ ] Versions match in both files
-- [ ] Version follows semver (major.minor.patch)
+4) **Monitor**
+   - Open GitHub Actions → `Release` workflow; wait for all matrix jobs to finish.
+   - Verify the draft release has the platform artifacts (.dmg, .msi/.exe, .AppImage/.deb/.rpm).
 
-## Testing
+5) **Publish**
+   - Edit the draft release notes if needed (paste from `CHANGELOG.md`).
+   - Publish the release (the workflow’s final job flips draft → published).
 
-### Local Build Testing
-- [ ] Development build runs: `npm run tauri dev`
-- [ ] Production build succeeds: `npm run tauri build`
-- [ ] Installer opens and installs correctly
-- [ ] App launches from installed version
-- [ ] All features work in production build
+6) **Post-Release**
+   - Download an installer from the release page and spot-check.
+   - Announce/communicate as needed.
 
-### Feature Testing
-- [ ] File operations (create, rename, delete)
-- [ ] Markdown rendering
-- [ ] Auto-save functionality
-- [ ] Keyboard shortcuts
-- [ ] Sidebar toggling (files/outline)
-- [ ] Font size adjustment
-- [ ] No crashes or freezes
-
-### Cross-Platform (if possible)
-- [ ] Test on macOS (Intel and/or Apple Silicon)
-- [ ] Test on Windows 10/11
-- [ ] Test on Linux (Ubuntu/Fedora)
-
-## Release Preparation
-
-### Website Updates
-- [ ] Update `website/script.js` with correct GITHUB_REPO
-- [ ] Update all GitHub links in `website/index.html`
-- [ ] Test website locally
-- [ ] Website mentions latest version features
-
-### Commit and Tag
-- [ ] Commit all changes:
-  ```bash
-  git add .
-  git commit -m "Release v0.x.0"
-  ```
-- [ ] Create annotated tag:
-  ```bash
-  git tag -a v0.x.0 -m "Release v0.x.0"
-  ```
-- [ ] Push commits and tags:
-  ```bash
-  git push origin master
-  git push origin v0.x.0
-  ```
-
-## During Release
-
-### Monitor Build
-- [ ] Go to GitHub Actions tab
-- [ ] Watch "Release" workflow
-- [ ] Check all three platform builds succeed
-  - [ ] macOS build completes
-  - [ ] Windows build completes
-  - [ ] Linux build completes
-- [ ] Verify builds take ~15-20 minutes total
-
-### GitHub Release
-- [ ] Draft release is created automatically
-- [ ] All platform installers are attached:
-  - [ ] macOS .dmg file
-  - [ ] Windows .msi file
-  - [ ] Windows .exe file (if configured)
-  - [ ] Linux .AppImage file
-  - [ ] Linux .deb package
-  - [ ] Linux .rpm package (if configured)
-- [ ] Edit release notes with highlights
-- [ ] Publish release (change from draft)
-
-## Post-Release
-
-### Verification
-- [ ] Download installers from GitHub Releases
-- [ ] Test each installer on respective platform
-- [ ] Verify download counts increment
-- [ ] Check website auto-updates with new version
-- [ ] Download links work correctly
-
-### Documentation
-- [ ] GitHub Releases page is clean and clear
-- [ ] README reflects current version
-- [ ] Documentation is accessible
-
-### Distribution
-
-#### Immediate
-- [ ] Tweet/post announcement
-- [ ] Update product description if needed
-- [ ] Reply to any waiting issues about the feature
-- [ ] Thank contributors (if any)
-
-#### Optional (for major releases)
-- [ ] Post on Product Hunt
-- [ ] Share on Reddit (r/opensource, r/markdown)
-- [ ] Post on Hacker News
-- [ ] Write blog post about the release
-- [ ] Update Homebrew Cask (if applicable)
-- [ ] Submit to package managers
-- [ ] Email newsletter (if you have one)
-
-### Monitoring
-- [ ] Watch for bug reports in first 24 hours
-- [ ] Monitor GitHub Issues
-- [ ] Check discussion forums
-- [ ] Be ready for hotfix if needed
-
-## Hotfix Process (if needed)
-
-If critical bug is found:
-
-- [ ] Create fix immediately
-- [ ] Bump patch version (0.1.0 → 0.1.1)
-- [ ] Follow this checklist again (abbreviated)
-- [ ] Release within 24-48 hours
-- [ ] Communicate clearly about the fix
-
-## Next Steps
-
-### Planning
-- [ ] Close milestone for this version
-- [ ] Create milestone for next version
-- [ ] Review roadmap
-- [ ] Prioritize next features based on feedback
-- [ ] Update project board
-
-### Community
-- [ ] Respond to feedback
-- [ ] Thank users for support
-- [ ] Address urgent issues
-- [ ] Plan next release timeline
-
----
-
-## Quick Commands Reference
-
-```bash
-# Version bump (do manually in files)
-# Update package.json and src-tauri/tauri.conf.json
-
-# Build and test
-npm run tauri build
-
-# Create release
-git add .
-git commit -m "Release v0.x.0"
-git tag -a v0.x.0 -m "Release v0.x.0"
-git push origin master
-git push origin v0.x.0
-
-# Watch build progress
-# Go to: https://github.com/yourusername/oasis-write/actions
-
-# After release
-# Check: https://github.com/yourusername/oasis-write/releases
-```
-
----
-
-**Remember**: Quality over speed. It's better to delay a release than to ship bugs!
+Notes:
+- Always tag the commit that already contains the final version numbers.
+- The frontend bundle embeds `package.json` version; ensure you built/tagged after bumping. CI will rebuild from source at that tag.***
