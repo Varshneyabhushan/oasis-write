@@ -1,0 +1,89 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main gradient: dark blue to green -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0891b2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Curved wave gradient overlay -->
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#1e3a8a;stop-opacity:0.3" />
+    </linearGradient>
+
+    <!-- Cursor gradient -->
+    <linearGradient id="cursorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e0e7ff;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Pattern for keyboard texture -->
+    <pattern id="keyboardPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect x="2" y="2" width="16" height="16" rx="2" fill="white" opacity="0.03"/>
+      <rect x="22" y="2" width="16" height="16" rx="2" fill="white" opacity="0.03"/>
+      <rect x="2" y="22" width="16" height="16" rx="2" fill="white" opacity="0.03"/>
+      <rect x="22" y="22" width="16" height="16" rx="2" fill="white" opacity="0.03"/>
+    </pattern>
+
+    <!-- Vignette gradient for subtle depth -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="50%">
+      <stop offset="60%" stop-color="black" stop-opacity="0" />
+      <stop offset="100%" stop-color="black" stop-opacity="0.2" />
+    </radialGradient>
+
+    <!-- Rounded-square mask to keep natural transparency with padding -->
+    <mask id="shapeMask">
+      <rect x="44" y="44" width="424" height="424" rx="72" ry="72" fill="white"/>
+    </mask>
+  </defs>
+
+  <!-- Icon artwork with natural transparent padding -->
+  <g>
+    <rect x="44" y="44" width="424" height="424" rx="72" ry="72" fill="url(#mainGradient)"/>
+    <rect x="44" y="44" width="424" height="424" rx="72" ry="72" fill="url(#keyboardPattern)"/>
+
+    <!-- Curved wave layers constrained to the square -->
+    <path d="M 0 256 Q 128 200 256 256 T 512 256 L 512 512 L 0 512 Z"
+          fill="url(#waveGradient)"
+          mask="url(#shapeMask)"/>
+    <path d="M 0 280 Q 128 230 256 280 T 512 280 L 512 512 L 0 512 Z"
+          fill="url(#waveGradient)"
+          opacity="0.4"
+          mask="url(#shapeMask)"/>
+
+    <!-- Foreground motif scaled inside the square -->
+    <g transform="translate(256 256) scale(0.82) translate(-256 -256)">
+      <g transform="translate(256, 200)">
+        <rect x="-4" y="-50" width="8" height="100" rx="2" fill="url(#cursorGradient)"/>
+        <rect x="-18" y="-50" width="36" height="8" rx="2" fill="url(#cursorGradient)"/>
+        <rect x="-18" y="42" width="36" height="8" rx="2" fill="url(#cursorGradient)"/>
+        <rect x="-4" y="-50" width="8" height="100" rx="2" fill="white" opacity="0.3"/>
+      </g>
+
+      <g opacity="0.15">
+        <rect x="140" y="320" width="24" height="24" rx="3" fill="white"/>
+        <rect x="170" y="320" width="24" height="24" rx="3" fill="white"/>
+        <rect x="200" y="320" width="24" height="24" rx="3" fill="white"/>
+        <rect x="230" y="320" width="24" height="24" rx="3" fill="white"/>
+        <rect x="260" y="320" width="24" height="24" rx="3" fill="white"/>
+        <rect x="290" y="320" width="24" height="24" rx="3" fill="white"/>
+        <rect x="320" y="320" width="24" height="24" rx="3" fill="white"/>
+        <rect x="350" y="320" width="24" height="24" rx="3" fill="white"/>
+
+        <rect x="155" y="350" width="24" height="24" rx="3" fill="white"/>
+        <rect x="185" y="350" width="24" height="24" rx="3" fill="white"/>
+        <rect x="215" y="350" width="24" height="24" rx="3" fill="white"/>
+        <rect x="245" y="350" width="24" height="24" rx="3" fill="white"/>
+        <rect x="275" y="350" width="24" height="24" rx="3" fill="white"/>
+        <rect x="305" y="350" width="24" height="24" rx="3" fill="white"/>
+        <rect x="335" y="350" width="24" height="24" rx="3" fill="white"/>
+
+        <rect x="180" y="380" width="150" height="24" rx="3" fill="white"/>
+      </g>
+    </g>
+
+    <rect x="44" y="44" width="424" height="424" rx="72" ry="72" fill="url(#vignette)"/>
+  </g>
+</svg>
