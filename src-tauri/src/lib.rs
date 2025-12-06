@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
+use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
+use tauri::Manager;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct FileEntry {
@@ -175,12 +177,87 @@ fn move_item(source_path: String, target_dir: String) -> Result<(), String> {
     Ok(())
 }
 
+// Helper function to create a new window
+fn create_new_window(app_handle: &tauri::AppHandle) {
+    use tauri::webview::WebviewWindowBuilder;
+
+    // Generate unique label using timestamp
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis();
+    let label = format!("oasis-write-{}", timestamp);
+
+    // Create new window with same config as main window
+    let _window = WebviewWindowBuilder::new(
+        app_handle,
+        &label,
+        tauri::WebviewUrl::App("index.html".into())
+    )
+    .title("Oasis Write")
+    .inner_size(1200.0, 800.0)
+    .min_inner_size(800.0, 600.0)
+    .focused(true)
+    .build();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .setup(|app| {
+            // Create New Window menu item
+            let new_window = MenuItem::with_id(
+                app,
+                "new_window",
+                "New Window",
+                true,
+                Some("CmdOrCtrl+N")
+            )?;
+
+            // Create app menu (macOS standard app menu)
+            let app_menu = Submenu::with_items(
+                app,
+                "Oasis Write",
+                true,
+                &[
+                    &PredefinedMenuItem::about(app, None, None)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::hide(app, None)?,
+                    &PredefinedMenuItem::hide_others(app, None)?,
+                    &PredefinedMenuItem::show_all(app, None)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::quit(app, None)?,
+                ]
+            )?;
+
+            // Create File menu
+            let file_menu = Submenu::with_items(
+                app,
+                "File",
+                true,
+                &[&new_window]
+            )?;
+
+            // Build complete menu with both app menu and File menu
+            let menu = Menu::with_items(
+                app,
+                &[&app_menu, &file_menu]
+            )?;
+
+            app.set_menu(menu)?;
+
+            // Handle menu events (both clicks and keyboard shortcuts)
+            app.on_menu_event(move |app_handle, event| {
+                if event.id().as_ref() == "new_window" {
+                    create_new_window(app_handle);
+                }
+            });
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             read_directory,
             read_file,
