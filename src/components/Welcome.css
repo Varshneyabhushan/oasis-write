@@ -75,3 +75,10 @@
   margin: 0;
   opacity: 0.7;
 }
+
+.welcome-version {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 8px 0 0 0;
+  opacity: 0.8;
+}

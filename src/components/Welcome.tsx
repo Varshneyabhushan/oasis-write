@@ -1,5 +1,7 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
+import { getVersion } from '@tauri-apps/api/app';
+import packageJson from '../../package.json';
 import './Welcome.css';
 
 interface WelcomeProps {
@@ -7,6 +9,20 @@ interface WelcomeProps {
 }
 
 const Welcome: FC<WelcomeProps> = ({ onFolderSelected }) => {
+  const [version, setVersion] = useState<string>(packageJson.version);
+
+  useEffect(() => {
+    const loadVersion = async () => {
+      try {
+        const appVersion = await getVersion();
+        setVersion(appVersion);
+      } catch (error) {
+        console.error('Failed to get version:', error);
+      }
+    };
+    loadVersion();
+  }, [packageJson.version]);
+
   const handleOpenFolder = async () => {
     try {
       const selected = await open({
@@ -44,6 +60,7 @@ const Welcome: FC<WelcomeProps> = ({ onFolderSelected }) => {
           <p className="welcome-hint">
             Select a folder containing markdown files to get started
           </p>
+          <p className="welcome-version">Version {version}</p>
         </div>
       </div>
     </div>
