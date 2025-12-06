@@ -33,16 +33,16 @@
       <stop offset="100%" stop-color="black" stop-opacity="0.2" />
     </radialGradient>
 
-    <!-- Rounded-square mask to keep natural transparency with padding -->
+    <!-- Rounded-square mask for the full canvas -->
     <mask id="shapeMask">
-      <rect x="44" y="44" width="424" height="424" rx="72" ry="72" fill="white"/>
+      <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="white"/>
     </mask>
   </defs>
 
   <!-- Icon artwork with natural transparent padding -->
   <g>
-    <rect x="44" y="44" width="424" height="424" rx="72" ry="72" fill="url(#mainGradient)"/>
-    <rect x="44" y="44" width="424" height="424" rx="72" ry="72" fill="url(#keyboardPattern)"/>
+    <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#mainGradient)"/>
+    <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#keyboardPattern)"/>
 
     <!-- Curved wave layers constrained to the square -->
     <path d="M 0 256 Q 128 200 256 256 T 512 256 L 512 512 L 0 512 Z"
@@ -84,6 +84,6 @@
       </g>
     </g>
 
-    <rect x="44" y="44" width="424" height="424" rx="72" ry="72" fill="url(#vignette)"/>
+    <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#vignette)"/>
   </g>
 </svg>
