@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import TipTapEditor from './TipTapEditor';
 import { Editor as TipTapEditorType } from '@tiptap/react';
+import type { OutlineHeading } from '../types';
 
 interface EditorProps {
   filePath?: string;
@@ -9,6 +10,7 @@ interface EditorProps {
   fontSize?: number;
   saveStatus?: 'saved' | 'saving' | 'unsaved';
   onEditorReady?: (editor: TipTapEditorType) => void;
+  onHeadingsChange?: (headings: OutlineHeading[]) => void;
 }
 
 const Editor: FC<EditorProps> = ({
@@ -17,6 +19,7 @@ const Editor: FC<EditorProps> = ({
   onContentChange,
   fontSize = 16,
   onEditorReady,
+  onHeadingsChange,
   // saveStatus = 'saved'
 }) => {
   // TODO: Add visual status bar to show save status (saved/saving/unsaved)
@@ -31,6 +34,7 @@ const Editor: FC<EditorProps> = ({
           onChange={onContentChange}
           fontSize={fontSize}
           onEditorReady={onEditorReady}
+          onHeadingsChange={onHeadingsChange}
         />
       </main>
     </div>

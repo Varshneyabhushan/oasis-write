@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Typography from '@tiptap/extension-typography';
@@ -14,6 +14,7 @@ import { Markdown } from 'tiptap-markdown';
 import { common, createLowlight } from 'lowlight';
 import { InputRule } from '@tiptap/core';
 import { CollapsibleHeading } from '../extensions/CollapsibleHeading';
+import type { OutlineHeading } from '../types';
 
 import './TipTapEditor.css';
 
@@ -94,14 +95,62 @@ function getMarkdownFromEditor(editor: Editor): string {
   return cleanupMarkdown(rawMarkdown);
 }
 
+const extractHeadingsFromDoc = (editor: Editor): OutlineHeading[] => {
+  const headings: OutlineHeading[] = [];
+  let index = 0;
+
+  editor.state.doc.descendants((node) => {
+    if (node.type.name !== 'heading') return;
+
+    const text = node.textContent?.trim();
+    if (!text) return;
+
+    const level = node.attrs.level || 1;
+    const slug = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+    const id = `${slug || 'heading'}-${index++}`;
+
+    headings.push({ level, text, id });
+  });
+
+  return headings;
+};
+
+const headingsEqual = (a: OutlineHeading[], b: OutlineHeading[]) => {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].level !== b[i].level || a[i].text !== b[i].text) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const emitHeadingsIfChanged = (
+  editor: Editor,
+  onHeadingsChange: ((headings: OutlineHeading[]) => void) | undefined,
+  lastHeadingsRef: { current: OutlineHeading[] | null }
+) => {
+  if (!onHeadingsChange) return;
+  const next = extractHeadingsFromDoc(editor);
+  const prev = lastHeadingsRef.current;
+  if (prev && headingsEqual(prev, next)) {
+    return;
+  }
+  lastHeadingsRef.current = next;
+  onHeadingsChange(next);
+};
+
 interface TipTapEditorProps {
   initialContent?: string;
   onChange?: (content: string) => void;
   fontSize?: number;
   onEditorReady?: (editor: Editor) => void;
+  onHeadingsChange?: (headings: OutlineHeading[]) => void;
 }
 
-const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16, onEditorReady }) => {
+const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16, onEditorReady, onHeadingsChange }) => {
+  const lastHeadingsRef = useRef<OutlineHeading[] | null>(null);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -150,15 +199,19 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
         const markdown = getMarkdownFromEditor(editor);
         onChange(markdown);
       }
+      emitHeadingsIfChanged(editor, onHeadingsChange, lastHeadingsRef);
     },
   });
 
-  // Notify parent when editor is ready
+  // Notify parent when editor is ready and send initial headings
   useEffect(() => {
     if (editor && onEditorReady) {
       onEditorReady(editor);
     }
-  }, [editor, onEditorReady]);
+    if (editor) {
+      emitHeadingsIfChanged(editor, onHeadingsChange, lastHeadingsRef);
+    }
+  }, [editor, onEditorReady, onHeadingsChange]);
 
   // Update content when initialContent changes (file switch)
   useEffect(() => {
@@ -167,8 +220,9 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
       if (currentContent !== initialContent) {
         editor.commands.setContent(initialContent);
       }
+      emitHeadingsIfChanged(editor, onHeadingsChange, lastHeadingsRef);
     }
-  }, [initialContent, editor]);
+  }, [initialContent, editor, onHeadingsChange]);
 
   if (!editor) {
     return null;

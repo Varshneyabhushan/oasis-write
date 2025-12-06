@@ -4,6 +4,7 @@ import FileTree, { FileEntry } from './FileTree';
 import Outline from './Outline';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 import InlineInput from './InlineInput';
+import type { OutlineHeading } from '../types';
 
 export type SidebarView = 'files' | 'outline';
 
@@ -16,6 +17,7 @@ interface DroppableContentProps {
   files: FileEntry[];
   selectedFile?: string;
   fileContent?: string;
+  outlineHeadings?: OutlineHeading[];
   contextMenu: { x: number; y: number } | null;
   onFileSelect: (path: string) => void;
   onCreateFile: (parentPath: string, fileName: string) => Promise<void>;
@@ -40,6 +42,7 @@ const DroppableContent: FC<DroppableContentProps> = ({
   files,
   selectedFile,
   fileContent,
+  outlineHeadings,
   contextMenu,
   onFileSelect,
   onCreateFile,
@@ -126,7 +129,11 @@ const DroppableContent: FC<DroppableContentProps> = ({
           )}
         </>
       ) : (
-        <Outline content={fileContent || ''} onHeadingClick={onHeadingClick} />
+        <Outline
+          content={fileContent || ''}
+          headings={outlineHeadings}
+          onHeadingClick={onHeadingClick}
+        />
       )}
     </div>
   );
@@ -147,6 +154,7 @@ interface SidebarProps {
   onDelete: (path: string, isDirectory: boolean) => Promise<void>;
   onMove: (sourcePath: string, targetDir: string, isDirectory: boolean) => Promise<void>;
   onHeadingClick?: (text: string, level: number) => void;
+  outlineHeadings?: OutlineHeading[];
 }
 
 const Sidebar: FC<SidebarProps> = ({
@@ -163,7 +171,8 @@ const Sidebar: FC<SidebarProps> = ({
   onRename,
   onDelete,
   onMove,
-  onHeadingClick
+  onHeadingClick,
+  outlineHeadings
 }) => {
   // Extract folder name from path - works cross-platform
   // Regex [\\/] matches both / (Mac/Linux) and \ (Windows)
@@ -383,6 +392,7 @@ const Sidebar: FC<SidebarProps> = ({
         files={files}
         selectedFile={selectedFile}
         fileContent={fileContent}
+        outlineHeadings={outlineHeadings}
         contextMenu={contextMenu}
         onFileSelect={onFileSelect}
         onCreateFile={onCreateFile}

@@ -6,7 +6,7 @@ import Sidebar, { SidebarView } from "./components/Sidebar";
 import Editor from "./components/Editor";
 import { FileEntry } from "./components/FileTree";
 import ConfirmDialog from "./components/ConfirmDialog";
-import { RecentItem } from "./types";
+import type { OutlineHeading, RecentItem } from "./types";
 import "./App.css";
 
 const RECENT_ITEMS_STORAGE_KEY = 'oasis-write-recent-items';
@@ -65,6 +65,7 @@ function App() {
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
   const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
+  const [outlineHeadings, setOutlineHeadings] = useState<OutlineHeading[]>([]);
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [sidebarView, setSidebarView] = useState<SidebarView>('files');
@@ -132,6 +133,7 @@ function App() {
   // Load file contents
   const loadFile = useCallback(async (path: string) => {
     try {
+      setOutlineHeadings([]);
       const content = await invoke<string>("read_file", { path });
       setFileContent(content);
       setOriginalContent(content);
@@ -491,6 +493,7 @@ function App() {
         onDelete={handleDelete}
         onMove={handleMove}
         onHeadingClick={scrollToHeading}
+        outlineHeadings={outlineHeadings}
       />
       <Editor
         filePath={selectedFile || undefined}
@@ -499,6 +502,7 @@ function App() {
         fontSize={fontSize}
         saveStatus={saveStatus}
         onEditorReady={setEditorInstance}
+        onHeadingsChange={setOutlineHeadings}
       />
 
       {/* Delete Confirmation Dialog */}

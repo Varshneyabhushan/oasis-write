@@ -5,3 +5,9 @@ export interface RecentItem {
   lastOpened: number;
   parentPath?: string;
 }
+
+export interface OutlineHeading {
+  level: number;
+  text: string;
+  id: string;
+}

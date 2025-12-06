@@ -1,26 +1,51 @@
 import { FC, useMemo } from 'react';
+import type { OutlineHeading } from '../types';
 import './Outline.css';
 
-interface HeadingItem {
-  level: number;
-  text: string;
-  id: string;
-}
-
 interface OutlineProps {
-  content: string;
+  headings?: OutlineHeading[];
+  content?: string;
   onHeadingClick?: (text: string, level: number) => void;
 }
 
-const Outline: FC<OutlineProps> = ({ content, onHeadingClick }) => {
-  const headings = useMemo(() => {
+// Remove fenced code blocks so that hashes inside code don't become headings
+const stripCodeFenceSections = (text: string) => {
+  const lines = text.split('\n');
+  const filteredLines: string[] = [];
+  let inCodeFence = false;
+
+  for (const line of lines) {
+    const trimmed = line.trimStart();
+    const isFence = trimmed.startsWith('```') || trimmed.startsWith('~~~');
+
+    if (isFence) {
+      inCodeFence = !inCodeFence;
+      continue; // Skip fence markers
+    }
+
+    if (!inCodeFence) {
+      filteredLines.push(line);
+    }
+  }
+
+  return filteredLines.join('\n');
+};
+
+const Outline: FC<OutlineProps> = ({ headings, content, onHeadingClick }) => {
+  const computedHeadings = useMemo(() => {
+    if (headings !== undefined) {
+      return headings;
+    }
+
     if (!content) return [];
 
+    const contentWithoutCode = stripCodeFenceSections(content);
+
     const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-    const items: HeadingItem[] = [];
+    const items: OutlineHeading[] = [];
     let match;
 
-    while ((match = headingRegex.exec(content)) !== null) {
+    while ((match = headingRegex.exec(contentWithoutCode)) !== null) {
       const level = match[1].length;
       const text = match[2].trim();
       const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
@@ -29,9 +54,9 @@ const Outline: FC<OutlineProps> = ({ content, onHeadingClick }) => {
     }
 
     return items;
-  }, [content]);
+  }, [headings, content]);
 
-  if (headings.length === 0) {
+  if (computedHeadings.length === 0) {
     return (
       <div className="outline-empty">
         No headings found in document
@@ -41,9 +66,9 @@ const Outline: FC<OutlineProps> = ({ content, onHeadingClick }) => {
 
   return (
     <div className="outline-container">
-      {headings.map((heading, index) => {
+      {computedHeadings.map((heading, index) => {
         // Check if next item is a child (higher level number)
-        const nextHeading = headings[index + 1];
+        const nextHeading = computedHeadings[index + 1];
         const hasChildren = nextHeading && nextHeading.level > heading.level;
 
         return (
