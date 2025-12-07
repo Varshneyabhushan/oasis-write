@@ -28,6 +28,20 @@ export const themes: Record<string, Theme> = {
       linkColor: '#289FAC',
     },
   },
+  crimsonNoir: {
+    name: 'Crimson Noir',
+    colors: {
+      bgPrimary: '#0F0F0F',
+      bgSecondary: '#272727',
+      textPrimary: '#F1F1F1',
+      textSecondary: '#B3B3B3',
+      borderColor: '#2F2F2F',
+      headingColor: '#FE0032',
+      accentColor: '#3EA6FF',
+      codeBg: '#161616',
+      linkColor: '#3EA6FF',
+    },
+  },
   nightfall: {
     name: 'Nightfall',
     colors: {

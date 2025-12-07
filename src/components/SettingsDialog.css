@@ -94,6 +94,103 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
+.settings-theme-select {
+  position: relative;
+}
+
+.settings-theme-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.12s ease;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.settings-theme-trigger.open {
+  border-color: var(--accent-color);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  background: var(--bg-primary);
+}
+
+.settings-theme-option-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-theme-option-name {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.settings-theme-sample {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.settings-theme-heading-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 9px;
+}
+
+.settings-theme-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+  z-index: 5;
+  overflow: hidden;
+}
+
+.settings-theme-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+}
+
+.settings-theme-menu-item:last-child {
+  border-bottom: none;
+}
+
+.settings-theme-menu-item:hover {
+  background: rgba(40, 159, 172, 0.08);
+}
+
+.settings-theme-menu-item.active {
+  background: rgba(40, 159, 172, 0.12);
+  border-color: var(--accent-color);
+}
+
 .settings-theme-option {
   display: flex;
   align-items: center;
@@ -140,7 +237,7 @@
   background: var(--bg-secondary);
 }
 
-.settings-theme-dot.accent {
+.settings-theme-dot.heading {
   border-color: transparent;
 }
 

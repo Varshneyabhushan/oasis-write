@@ -1,6 +1,6 @@
 import { FC, MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
-import { themes } from '../themes';
+import { themes, defaultTheme } from '../themes';
 import './SettingsDialog.css';
 
 interface SettingsDialogProps {
@@ -25,7 +25,9 @@ const fontOptions = [
 
 const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
   const { themeName, setTheme, fontFamily, setFontFamily } = useTheme();
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [fontMenuOpen, setFontMenuOpen] = useState(false);
+  const themeSelectRef = useRef<HTMLDivElement | null>(null);
   const fontSelectRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -49,16 +51,18 @@ const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | globalThis.MouseEvent) => {
-      if (!fontMenuOpen) return;
       const target = event.target as Node;
-      if (fontSelectRef.current && !fontSelectRef.current.contains(target)) {
+      if (fontMenuOpen && fontSelectRef.current && !fontSelectRef.current.contains(target)) {
         setFontMenuOpen(false);
+      }
+      if (themeMenuOpen && themeSelectRef.current && !themeSelectRef.current.contains(target)) {
+        setThemeMenuOpen(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [fontMenuOpen]);
+  }, [fontMenuOpen, themeMenuOpen]);
 
   const displayFontOptions = useMemo(() => {
     const hasCustom = fontOptions.some(option => option.value === fontFamily);
@@ -69,6 +73,17 @@ const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
   const currentFontOption = useMemo(() => {
     return displayFontOptions.find((option) => option.value === fontFamily) || displayFontOptions[0];
   }, [displayFontOptions, fontFamily]);
+
+  const currentThemeOption = useMemo(() => {
+    return themes[themeName] || themes[defaultTheme];
+  }, [themeName]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFontMenuOpen(false);
+      setThemeMenuOpen(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -98,33 +113,56 @@ const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
 
           <div className="settings-field">
             <div className="settings-label">Theme</div>
-            <div className="settings-theme-grid">
-              {Object.entries(themes).map(([key, theme]) => (
-                <button
-                  key={key}
-                  className={`settings-theme-option ${key === themeName ? 'active' : ''}`}
-                  onClick={() => setTheme(key)}
-                >
-                  <div className="settings-theme-swatches">
+            <div className="settings-theme-select" ref={themeSelectRef}>
+              <button
+                type="button"
+                className={`settings-theme-trigger ${themeMenuOpen ? 'open' : ''}`}
+                onClick={() => setThemeMenuOpen(prev => !prev)}
+                title={currentThemeOption.name}
+              >
+                <div className="settings-theme-option-body">
+                  <span
+                    className="settings-theme-sample"
+                    style={{ backgroundColor: currentThemeOption.colors.bgSecondary }}
+                    aria-hidden
+                  >
                     <span
-                      className="settings-theme-dot"
-                      style={{ backgroundColor: theme.colors.bgSecondary }}
-                      aria-hidden
+                      className="settings-theme-heading-bar"
+                      style={{ backgroundColor: currentThemeOption.colors.headingColor }}
                     />
-                    <span
-                      className="settings-theme-dot accent"
-                      style={{ backgroundColor: theme.colors.accentColor }}
-                      aria-hidden
-                    />
-                  </div>
-                  <div className="settings-theme-copy">
-                    <span className="settings-theme-name">{theme.name}</span>
-                    {key === themeName && (
-                      <span className="settings-theme-hint">Active</span>
-                    )}
-                  </div>
-                </button>
-              ))}
+                  </span>
+                  <span className="settings-theme-option-name">{currentThemeOption.name}</span>
+                </div>
+                <span className="settings-font-caret" aria-hidden="true">▾</span>
+              </button>
+              {themeMenuOpen && (
+                <div className="settings-theme-menu">
+                  {Object.entries(themes).map(([key, theme]) => (
+                    <button
+                      key={key}
+                      className={`settings-theme-menu-item ${key === themeName ? 'active' : ''}`}
+                      onClick={() => {
+                        setTheme(key);
+                        setThemeMenuOpen(false);
+                      }}
+                    >
+                      <div className="settings-theme-option-body">
+                        <span
+                          className="settings-theme-sample"
+                          style={{ backgroundColor: theme.colors.bgSecondary }}
+                          aria-hidden
+                        >
+                          <span
+                            className="settings-theme-heading-bar"
+                            style={{ backgroundColor: theme.colors.headingColor }}
+                          />
+                        </span>
+                        <span className="settings-theme-option-name">{theme.name}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
