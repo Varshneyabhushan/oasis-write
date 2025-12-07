@@ -4,7 +4,7 @@
 
 .file-tree-item {
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   position: relative;
 }
 
@@ -28,7 +28,7 @@
   transform: translateY(-50%);
   color: var(--accent-color);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   pointer-events: none;
 }
 
@@ -49,7 +49,7 @@
 .file-tree-row.selected {
   background-color: rgba(93, 173, 226, 0.25);
   color: var(--accent-color);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .file-tree-row[draggable="true"] {
@@ -162,7 +162,7 @@
   padding: 2px 4px;
   font-family: inherit;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
   outline: none;
 }
