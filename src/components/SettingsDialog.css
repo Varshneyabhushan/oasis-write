@@ -18,6 +18,7 @@
   padding: 20px 22px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
   animation: settingsDialogPop 200ms ease-out;
+  font-size: 16px;
 }
 
 .settings-header {
@@ -30,14 +31,14 @@
 
 .settings-title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 20px;
   color: var(--text-primary);
 }
 
 .settings-subtitle {
   margin: 4px 0 0 0;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 15px;
 }
 
 .settings-close {
@@ -68,7 +69,7 @@
   color: var(--text-secondary);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 12px;
 }
 
 .settings-field {
@@ -85,7 +86,7 @@
 .settings-label {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 15px;
 }
 
 .settings-theme-grid {
@@ -112,6 +113,7 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.12s ease;
   color: var(--text-primary);
   text-align: left;
+  font-size: 16px;
 }
 
 .settings-theme-trigger.open {
@@ -129,6 +131,7 @@
 .settings-theme-option-name {
   font-weight: 700;
   color: var(--text-primary);
+  font-size: 17px;
 }
 
 .settings-theme-sample {
@@ -176,6 +179,7 @@
   cursor: pointer;
   text-align: left;
   transition: background-color 0.1s ease, border-color 0.1s ease;
+  font-size: 16px;
 }
 
 .settings-theme-menu-item:last-child {
@@ -250,12 +254,12 @@
 .settings-theme-name {
   font-weight: 700;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 15px;
 }
 
 .settings-theme-hint {
   color: var(--text-secondary);
-  font-size: 0.8rem;
+  font-size: 13px;
 }
 
 .settings-font-select {
@@ -276,6 +280,7 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
   color: var(--text-primary);
   text-align: left;
+  font-size: 16px;
 }
 
 .settings-font-trigger.open {
@@ -291,6 +296,7 @@
 
 .settings-font-option-name {
   font-weight: 700;
+  font-size: 17px;
 }
 
 .settings-font-caret {
@@ -324,6 +330,7 @@
   cursor: pointer;
   text-align: left;
   transition: background-color 0.1s ease, border-color 0.1s ease;
+  font-size: 16px;
 }
 
 .settings-font-menu-item:last-child {
