@@ -456,51 +456,48 @@ function App() {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
 
-      // Cmd/Ctrl + N to open a new window
+      // Check if we're in an editable element - if so, skip file operations
+      const activeEl = document.activeElement;
+      const inEditor = activeEl?.getAttribute('contenteditable') === 'true' ||
+                       activeEl?.tagName === 'INPUT' ||
+                       activeEl?.tagName === 'TEXTAREA';
+
+      // Cmd/Ctrl + N - New window (global)
       if ((e.metaKey || e.ctrlKey) && key === 'n' && !e.shiftKey && !e.altKey) {
         e.preventDefault();
-        if (!e.repeat) {
-          handleNewWindowShortcut();
+        if (!e.repeat) handleNewWindowShortcut();
+        return;
+      }
+
+      // Cmd/Ctrl + X/C/V - File operations (only when NOT in editor)
+      if (!inEditor && (e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
+        if (key === 'x' && selectedFile) {
+          e.preventDefault();
+          const isDir = isPathDirectory(selectedFile);
+          const name = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
+          handleCut(selectedFile, name, isDir);
+          return;
         }
-        return;
-      }
-      // Cmd/Ctrl + X to cut
-      if ((e.metaKey || e.ctrlKey) && key === 'x' && selectedFile && !e.shiftKey && !e.altKey) {
-        e.preventDefault();
-        const isDirectory = isPathDirectory(selectedFile);
-        const name = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
-        handleCut(selectedFile, name, isDirectory);
-        return;
-      }
-      // Cmd/Ctrl + C to copy
-      if ((e.metaKey || e.ctrlKey) && key === 'c' && selectedFile && !e.shiftKey && !e.altKey) {
-        e.preventDefault();
-        const isDirectory = isPathDirectory(selectedFile);
-        const name = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
-        handleCopy(selectedFile, name, isDirectory);
-        return;
-      }
-      // Cmd/Ctrl + V to paste
-      if ((e.metaKey || e.ctrlKey) && key === 'v' && clipboard && !e.shiftKey && !e.altKey) {
-        e.preventDefault();
-        // Determine target directory
-        let targetDir = folderPath;
-        if (selectedFile) {
-          const isDirectory = isPathDirectory(selectedFile);
-          if (isDirectory) {
-            // Paste into the selected directory
-            targetDir = selectedFile;
-          } else {
-            // Paste into parent of selected file
-            targetDir = selectedFile.substring(0, selectedFile.lastIndexOf('/'));
+        if (key === 'c' && selectedFile) {
+          e.preventDefault();
+          const isDir = isPathDirectory(selectedFile);
+          const name = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
+          handleCopy(selectedFile, name, isDir);
+          return;
+        }
+        if (key === 'v' && clipboard) {
+          e.preventDefault();
+          let targetDir = folderPath;
+          if (selectedFile) {
+            const isDir = isPathDirectory(selectedFile);
+            targetDir = isDir ? selectedFile : selectedFile.substring(0, selectedFile.lastIndexOf('/'));
           }
+          if (targetDir) handlePaste(targetDir);
+          return;
         }
-        if (targetDir) {
-          handlePaste(targetDir);
-        }
-        return;
       }
-      // Cmd/Ctrl + S to save
+
+      // Cmd/Ctrl + S - Save (global)
       if ((e.metaKey || e.ctrlKey) && key === 's') {
         e.preventDefault();
         saveFile();
@@ -547,8 +544,8 @@ function App() {
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown, { capture: true });
-    return () => document.removeEventListener('keydown', handleKeyDown, { capture: true });
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [saveFile, sidebarVisible, sidebarView, increaseFontSize, decreaseFontSize, selectedFile, clipboard, folderPath, isPathDirectory, handleCut, handleCopy, handlePaste, handleNewWindowShortcut]);
 
   // Handler for sidebar view change

@@ -326,10 +326,26 @@ pub fn run() {
                 &[&new_window]
             )?;
 
-            // Build complete menu with both app menu and File menu
+            // Create Edit menu with standard clipboard operations
+            let edit_menu = Submenu::with_items(
+                app,
+                "Edit",
+                true,
+                &[
+                    &PredefinedMenuItem::undo(app, None)?,
+                    &PredefinedMenuItem::redo(app, None)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::cut(app, None)?,
+                    &PredefinedMenuItem::copy(app, None)?,
+                    &PredefinedMenuItem::paste(app, None)?,
+                    &PredefinedMenuItem::select_all(app, None)?,
+                ]
+            )?;
+
+            // Build complete menu with app menu, File menu, and Edit menu
             let menu = Menu::with_items(
                 app,
-                &[&app_menu, &file_menu]
+                &[&app_menu, &file_menu, &edit_menu]
             )?;
 
             app.set_menu(menu)?;
