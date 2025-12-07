@@ -25,6 +25,23 @@ const Editor: FC<EditorProps> = ({
   // TODO: Add visual status bar to show save status (saved/saving/unsaved)
   // Status bar should display at the top of the editor with color-coded indicators
 
+  // Show empty state when no file is selected
+  if (!filePath) {
+    return (
+      <div className="editor-container">
+        <main className="editor-main">
+          <div className="empty-state">
+            <div className="empty-state-content">
+              <h2>No file selected</h2>
+              <p>Open a file to start editing</p>
+              <p className="empty-state-hint">Or create a new file with right-click → New File</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="editor-container">
       <main className="editor-main">

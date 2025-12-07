@@ -10,6 +10,7 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
+import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from 'tiptap-markdown';
 import { common, createLowlight } from 'lowlight';
 import { InputRule } from '@tiptap/core';
@@ -150,6 +151,8 @@ interface TipTapEditorProps {
 
 const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16, onEditorReady, onHeadingsChange }) => {
   const lastHeadingsRef = useRef<OutlineHeading[] | null>(null);
+  // Capture whether file was empty when first loaded (for this editor session)
+  const wasInitiallyEmpty = useRef(!initialContent || initialContent.trim() === '');
 
   const editor = useEditor({
     extensions: [
@@ -181,6 +184,9 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
       TaskList,
       TaskItem.configure({
         nested: true,
+      }),
+      Placeholder.configure({
+        placeholder: 'Start writing... Markdown formatting is supported (headings, bold, italic, lists, and more)',
       }),
       Markdown.configure({
         html: false,
@@ -229,7 +235,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
   }
 
   return (
-    <div className="tiptap-container" style={{ fontSize: `${fontSize}px` }}>
+    <div className={`tiptap-container ${wasInitiallyEmpty.current ? 'empty-file' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       <EditorContent editor={editor} />
     </div>
   );
