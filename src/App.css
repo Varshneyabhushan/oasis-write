@@ -1,3 +1,9 @@
+@import "@fontsource/ubuntu-mono/400.css";
+@import "@fontsource/ubuntu-mono/400-italic.css";
+@import "@fontsource/varela-round/400.css";
+@import "@fontsource/caveat/400.css";
+@import "@fontsource/caveat/700.css";
+
 :root {
   --sidebar-width: 25rem;
   /* Theme colors are set dynamically by ThemeProvider */

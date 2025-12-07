@@ -21,6 +21,18 @@ const fontOptions = [
     label: 'Mono',
     value: '"JetBrains Mono", "SFMono-Regular", "Menlo", "Consolas", monospace',
   },
+  {
+    label: 'Ubuntu Mono',
+    value: '"Ubuntu Mono", "SFMono-Regular", "Menlo", "Consolas", monospace',
+  },
+  {
+    label: 'Varela Round',
+    value: '"Varela Round", "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif',
+  },
+  {
+    label: 'Caveat',
+    value: 'Caveat, "Segoe UI", system-ui, -apple-system, sans-serif',
+  },
 ];
 
 const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
