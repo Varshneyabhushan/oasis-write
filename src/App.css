@@ -6,7 +6,7 @@
 
 :root {
   --sidebar-width: 25rem;
-  --sidebar-effective-width: min(var(--sidebar-width), 25vw);
+  --sidebar-effective-width: min(var(--sidebar-width), 20vw);
   /* Theme colors are set dynamically by ThemeProvider */
   --app-font-family: Inter, "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif;
   --code-font-family: "SFMono-Regular", "JetBrains Mono", "Menlo", "Consolas", monospace;
@@ -45,7 +45,7 @@ button, input, select, textarea {
 /* Sidebar */
 .sidebar {
   width: var(--sidebar-effective-width);
-  max-width: 25vw;
+  max-width: 20vw;
   flex: 0 0 var(--sidebar-effective-width);
   background-color: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
