@@ -9,6 +9,9 @@ import { FileEntry } from "./components/FileTree";
 import ConfirmDialog from "./components/ConfirmDialog";
 import SettingsDialog from "./components/SettingsDialog";
 import type { OutlineHeading, RecentItem } from "./types";
+import { useFolderWatcher } from "./hooks/useFolderWatcher";
+import { useFileHashes } from "./hooks/useFileHashes";
+import { useFileWatcher } from "./hooks/useFileWatcher";
 import "./App.css";
 
 const RECENT_ITEMS_STORAGE_KEY = 'oasis-write-recent-items';
@@ -92,6 +95,16 @@ function App() {
 
   const [editorInstance, setEditorInstance] = useState<TipTapEditorType | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const {
+    bufferHashRef,
+    lastDiskHashRef,
+    lastSaveAtRef,
+    updateBufferHash,
+    syncFromDisk,
+    shouldSkipSave,
+    noteSave,
+  } = useFileHashes(selectedFile);
 
   const handleNewWindowShortcut = useCallback(() => {
     invoke("create_new_window").catch((error) => {
@@ -192,21 +205,32 @@ function App() {
       setOriginalContent(content);
       setSelectedFile(path);
       setIsDirty(false);
+      syncFromDisk(content);
     } catch (error) {
       console.error("Failed to load file:", error);
     }
-  }, []);
+  }, [syncFromDisk]);
 
   // Save file contents
   const saveFile = useCallback(async () => {
     if (!selectedFile || !isDirty) return;
 
+    // Skip writing identical content to avoid self-triggered loops
+    if (shouldSkipSave(fileContent)) {
+      setOriginalContent(fileContent);
+      setIsDirty(false);
+      setSaveStatus('saved');
+      return;
+    }
+
+    lastSaveAtRef.current = performance.now();
     setSaveStatus('saving');
     try {
       await invoke("write_file", {
         path: selectedFile,
         contents: fileContent,
       });
+      noteSave(fileContent);
       setOriginalContent(fileContent);
       setIsDirty(false);
       setSaveStatus('saved');
@@ -215,7 +239,7 @@ function App() {
       console.error("Failed to save file:", error);
       setSaveStatus('unsaved');
     }
-  }, [selectedFile, fileContent, isDirty]);
+  }, [selectedFile, fileContent, isDirty, shouldSkipSave, noteSave]);
 
   // Handle folder selection from Welcome screen
   const handleFolderSelected = (path: string) => {
@@ -244,11 +268,14 @@ function App() {
 
   // Handle content change in editor
   const handleContentChange = (content: string) => {
+    updateBufferHash(content);
     setFileContent(content);
     // Only mark as dirty if content actually changed from original
     if (content !== originalContent) {
       setIsDirty(true);
       setSaveStatus('unsaved');
+    } else {
+      setIsDirty(false);
     }
   };
 
@@ -415,6 +442,47 @@ function App() {
       alert(`Failed to paste: ${error}`);
     }
   }, [clipboard, handleMove, handleDuplicate]);
+
+  const handleExternalDirtyChange = useCallback(() => {
+    setSaveStatus('unsaved');
+  }, []);
+
+  const handleExternalAccept = useCallback((content: string) => {
+    setFileContent(content);
+    setOriginalContent(content);
+    setIsDirty(false);
+    setSaveStatus('saved');
+  }, []);
+
+  const handleExternalCleanMatch = useCallback((content: string) => {
+    if (isDirty) {
+      setIsDirty(false);
+      setSaveStatus('saved');
+      setOriginalContent(content);
+    }
+  }, [isDirty]);
+
+  const folderRevision = useFolderWatcher({
+    folderPath,
+  });
+
+  useEffect(() => {
+    if (folderPath && folderRevision > 0) {
+      loadFolder(folderPath);
+    }
+  }, [folderRevision, folderPath, loadFolder]);
+
+  useFileWatcher({
+    filePath: selectedFile,
+    isDirty,
+    lastSaveAtRef,
+    bufferHashRef,
+    lastDiskHashRef,
+    syncFromDisk,
+    onDirtyExternalChange: handleExternalDirtyChange,
+    onAcceptExternal: handleExternalAccept,
+    onCleanMatch: handleExternalCleanMatch,
+  });
 
   // Confirm delete operation
   const handleConfirmDelete = useCallback(async () => {

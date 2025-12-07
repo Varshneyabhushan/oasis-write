@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-12-07
+
+### Added
+- Real-time folder and file watching powered by the Tauri FS plugin (watch feature enabled) with debounce and recursive support.
+
+### Changed
+- Hash-based save loop protection and external-change handling now live in dedicated hooks/services for clearer ownership and resilience against self-triggered events.
+- Auto-reload of the open file avoids clobbering unsaved edits and ignores no-op saves, reducing redundant disk writes.
+
 ## [0.5.3] - 2025-12-07
 
 ### Changed

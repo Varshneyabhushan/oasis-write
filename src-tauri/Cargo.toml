@@ -1,6 +1,6 @@
 [package]
 name = "oasis-write"
-version = "0.5.3"
+version = "0.6.0"
 description = "A serene and focused markdown writing environment"
 authors = ["Oasis Write Contributors"]
 edition = "2021"
@@ -21,6 +21,6 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
-tauri-plugin-fs = "2"
+tauri-plugin-fs = { version = "2", features = ["watch"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
