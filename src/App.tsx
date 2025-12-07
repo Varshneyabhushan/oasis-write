@@ -99,6 +99,16 @@ function App() {
     });
   }, []);
 
+  // Keep global font size in sync (affects editor and sidebar/UI)
+  useEffect(() => {
+    const root = document.documentElement;
+    const previousFontSize = root.style.fontSize;
+    root.style.fontSize = `${fontSize}px`;
+    return () => {
+      root.style.fontSize = previousFontSize;
+    };
+  }, [fontSize]);
+
   // Helper to check if a path is a directory
   const isPathDirectory = useCallback((path: string): boolean => {
     const checkInFiles = (entries: FileEntry[]): boolean => {
