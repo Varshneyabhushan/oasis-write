@@ -93,7 +93,7 @@ export const themes: Record<string, Theme> = {
       textSecondary: '#839596',
       borderColor: '#E4DFC8',
       headingColor: '#268BD2',
-      accentColor: '#268BD2',
+      accentColor: '#B58900',
       codeBg: '#F2EBD5',
       linkColor: '#B58900',
     },
