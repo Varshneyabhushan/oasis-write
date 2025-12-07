@@ -19,7 +19,7 @@
   font-size: 1em;
   line-height: 1.5;
   color: var(--text-primary);
-  font-family: monospace;
+  font-family: var(--app-font-family);
   font-weight: 500;
 }
 
@@ -238,7 +238,7 @@
   border: 0.0625em solid var(--border-color);
   border-radius: 0.125em;
   padding: 0.1875em 0.375em;
-  font-family: monospace;
+  font-family: var(--code-font-family);
   font-size: 0.95em;
   color: var(--accent-color);
 }
@@ -250,7 +250,7 @@
   border-radius: 0;
   padding: 1.25em;
   margin: 1.25em 0;
-  font-family: monospace;
+  font-family: var(--code-font-family);
   font-size: 0.875em;
   overflow-x: auto;
   line-height: 1.6;

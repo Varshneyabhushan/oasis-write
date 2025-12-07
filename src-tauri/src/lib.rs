@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
-use tauri::Manager;
+use tauri::Emitter;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct FileEntry {
@@ -293,7 +293,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
-            // Create New Window menu item
+            // Create menu items
             let new_window = MenuItem::with_id(
                 app,
                 "new_window",
@@ -302,29 +302,64 @@ pub fn run() {
                 Some("CmdOrCtrl+N")
             )?;
 
-            // Create app menu (macOS standard app menu)
-            let app_menu = Submenu::with_items(
+            let settings = MenuItem::with_id(
                 app,
-                "Oasis Write",
+                "open_settings",
+                if cfg!(target_os = "macos") { "Settings..." } else { "Settings" },
                 true,
-                &[
-                    &PredefinedMenuItem::about(app, None, None)?,
-                    &PredefinedMenuItem::separator(app)?,
-                    &PredefinedMenuItem::hide(app, None)?,
-                    &PredefinedMenuItem::hide_others(app, None)?,
-                    &PredefinedMenuItem::show_all(app, None)?,
-                    &PredefinedMenuItem::separator(app)?,
-                    &PredefinedMenuItem::quit(app, None)?,
-                ]
+                Some("CmdOrCtrl+,")
             )?;
 
+            // Create app menu (macOS standard app menu)
+            let app_menu = if cfg!(target_os = "macos") {
+                Submenu::with_items(
+                    app,
+                    "Oasis Write",
+                    true,
+                    &[
+                        &PredefinedMenuItem::about(app, None, None)?,
+                        &settings,
+                        &PredefinedMenuItem::separator(app)?,
+                        &PredefinedMenuItem::hide(app, None)?,
+                        &PredefinedMenuItem::hide_others(app, None)?,
+                        &PredefinedMenuItem::show_all(app, None)?,
+                        &PredefinedMenuItem::separator(app)?,
+                        &PredefinedMenuItem::quit(app, None)?,
+                    ]
+                )?
+            } else {
+                Submenu::with_items(
+                    app,
+                    "Oasis Write",
+                    true,
+                    &[
+                        &PredefinedMenuItem::about(app, None, None)?,
+                        &PredefinedMenuItem::separator(app)?,
+                        &PredefinedMenuItem::hide(app, None)?,
+                        &PredefinedMenuItem::hide_others(app, None)?,
+                        &PredefinedMenuItem::show_all(app, None)?,
+                        &PredefinedMenuItem::separator(app)?,
+                        &PredefinedMenuItem::quit(app, None)?,
+                    ]
+                )?
+            };
+
             // Create File menu
-            let file_menu = Submenu::with_items(
-                app,
-                "File",
-                true,
-                &[&new_window]
-            )?;
+            let file_menu = if cfg!(target_os = "macos") {
+                Submenu::with_items(
+                    app,
+                    "File",
+                    true,
+                    &[&new_window]
+                )?
+            } else {
+                Submenu::with_items(
+                    app,
+                    "File",
+                    true,
+                    &[&new_window, &PredefinedMenuItem::separator(app)?, &settings]
+                )?
+            };
 
             // Create Edit menu with standard clipboard operations
             let edit_menu = Submenu::with_items(
@@ -352,10 +387,18 @@ pub fn run() {
 
             // Handle menu events (both clicks and keyboard shortcuts)
             app.on_menu_event(move |app_handle, event| {
-                if event.id().as_ref() == "new_window" {
-                    if let Err(err) = spawn_new_window(app_handle) {
-                        eprintln!("Failed to create new window from menu: {}", err);
+                match event.id().as_ref() {
+                    "new_window" => {
+                        if let Err(err) = spawn_new_window(app_handle) {
+                            eprintln!("Failed to create new window from menu: {}", err);
+                        }
                     }
+                    "open_settings" => {
+                        if let Err(err) = app_handle.emit("open-settings", ()) {
+                            eprintln!("Failed to open settings from menu: {}", err);
+                        }
+                    }
+                    _ => {}
                 }
             });
 

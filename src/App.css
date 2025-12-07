@@ -1,8 +1,10 @@
 :root {
   --sidebar-width: 25rem;
   /* Theme colors are set dynamically by ThemeProvider */
+  --app-font-family: Inter, "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --code-font-family: "SFMono-Regular", "JetBrains Mono", "Menlo", "Consolas", monospace;
 
-  font-family: monospace;
+  font-family: var(--app-font-family);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -20,6 +22,10 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
 }
 
 .app {

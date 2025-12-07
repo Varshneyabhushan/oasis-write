@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { Editor as TipTapEditorType } from "@tiptap/react";
 import Welcome from "./components/Welcome";
 import Sidebar, { SidebarView } from "./components/Sidebar";
 import Editor from "./components/Editor";
 import { FileEntry } from "./components/FileTree";
 import ConfirmDialog from "./components/ConfirmDialog";
+import SettingsDialog from "./components/SettingsDialog";
 import type { OutlineHeading, RecentItem } from "./types";
 import "./App.css";
 
@@ -89,6 +91,7 @@ function App() {
   const [clipboard, setClipboard] = useState<ClipboardItem | null>(null);
 
   const [editorInstance, setEditorInstance] = useState<TipTapEditorType | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleNewWindowShortcut = useCallback(() => {
     invoke("create_new_window").catch((error) => {
@@ -120,6 +123,14 @@ function App() {
 
   const decreaseFontSize = useCallback(() => {
     setFontSize(prev => Math.max(prev - 2, 10)); // Min 10px
+  }, []);
+
+  const openSettings = useCallback(() => {
+    setIsSettingsOpen(true);
+  }, []);
+
+  const closeSettings = useCallback(() => {
+    setIsSettingsOpen(false);
   }, []);
 
   const addRecentItem = useCallback((path: string, type: RecentItem['type']) => {
@@ -462,6 +473,13 @@ function App() {
                        activeEl?.tagName === 'INPUT' ||
                        activeEl?.tagName === 'TEXTAREA';
 
+      // Cmd/Ctrl + , - Open settings (global)
+      if ((e.metaKey || e.ctrlKey) && key === ',' && !e.shiftKey && !e.altKey) {
+        e.preventDefault();
+        openSettings();
+        return;
+      }
+
       // Cmd/Ctrl + N - New window (global)
       if ((e.metaKey || e.ctrlKey) && key === 'n' && !e.shiftKey && !e.altKey) {
         e.preventDefault();
@@ -546,7 +564,25 @@ function App() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [saveFile, sidebarVisible, sidebarView, increaseFontSize, decreaseFontSize, selectedFile, clipboard, folderPath, isPathDirectory, handleCut, handleCopy, handlePaste, handleNewWindowShortcut]);
+  }, [saveFile, sidebarVisible, sidebarView, increaseFontSize, decreaseFontSize, selectedFile, clipboard, folderPath, isPathDirectory, handleCut, handleCopy, handlePaste, handleNewWindowShortcut, openSettings]);
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
+    listen("open-settings", () => {
+      openSettings();
+    }).then((unlisten) => {
+      unsubscribe = unlisten;
+    }).catch((error) => {
+      console.error("Failed to listen for settings menu event:", error);
+    });
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [openSettings]);
 
   // Handler for sidebar view change
   const handleViewChange = (view: SidebarView) => {
@@ -583,11 +619,14 @@ function App() {
   // Show welcome screen if no folder is opened
   if (!folderPath) {
     return (
-      <Welcome
-        onFolderSelected={handleFolderSelected}
-        recentItems={recentItems}
-        onOpenRecent={handleOpenRecent}
-      />
+      <>
+        <Welcome
+          onFolderSelected={handleFolderSelected}
+          recentItems={recentItems}
+          onOpenRecent={handleOpenRecent}
+        />
+        <SettingsDialog isOpen={isSettingsOpen} onClose={closeSettings} />
+      </>
     );
   }
 
@@ -623,6 +662,8 @@ function App() {
         onEditorReady={setEditorInstance}
         onHeadingsChange={setOutlineHeadings}
       />
+
+      <SettingsDialog isOpen={isSettingsOpen} onClose={closeSettings} />
 
       {/* Delete Confirmation Dialog */}
       {deleteConfirmation && (

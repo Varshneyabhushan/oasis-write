@@ -1,10 +1,17 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Theme, themes, defaultTheme } from '../themes';
 
+const THEME_STORAGE_KEY = 'oasis-write-theme';
+const FONT_STORAGE_KEY = 'oasis-write-font-family';
+const DEFAULT_FONT_FAMILY = 'Inter, "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif';
+const DEFAULT_CODE_FONT = '"SFMono-Regular", "JetBrains Mono", "Menlo", "Consolas", monospace';
+
 interface ThemeContextType {
   currentTheme: Theme;
   themeName: string;
   setTheme: (themeName: string) => void;
+  fontFamily: string;
+  setFontFamily: (fontFamily: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -22,7 +29,28 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [themeName, setThemeName] = useState<string>(defaultTheme);
+  const [themeName, setThemeName] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored && themes[stored]) {
+        return stored;
+      }
+    } catch (error) {
+      console.error('Failed to read stored theme:', error);
+    }
+    return defaultTheme;
+  });
+
+  const [fontFamily, setFontFamily] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem(FONT_STORAGE_KEY);
+      if (stored) return stored;
+    } catch (error) {
+      console.error('Failed to read stored font family:', error);
+    }
+    return DEFAULT_FONT_FAMILY;
+  });
+
   const currentTheme = themes[themeName] || themes[defaultTheme];
 
   useEffect(() => {
@@ -39,7 +67,25 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     root.style.setProperty('--accent-color', colors.accentColor);
     root.style.setProperty('--code-bg', colors.codeBg);
     root.style.setProperty('--link-color', colors.linkColor);
-  }, [currentTheme]);
+
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, themeName);
+    } catch (error) {
+      console.error('Failed to store theme preference:', error);
+    }
+  }, [currentTheme, themeName]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--app-font-family', fontFamily);
+    root.style.setProperty('--code-font-family', DEFAULT_CODE_FONT);
+
+    try {
+      localStorage.setItem(FONT_STORAGE_KEY, fontFamily);
+    } catch (error) {
+      console.error('Failed to store font preference:', error);
+    }
+  }, [fontFamily]);
 
   const setTheme = (newThemeName: string) => {
     if (themes[newThemeName]) {
@@ -47,8 +93,12 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     }
   };
 
+  const handleFontFamilyChange = (newFont: string) => {
+    setFontFamily(newFont || DEFAULT_FONT_FAMILY);
+  };
+
   return (
-    <ThemeContext.Provider value={{ currentTheme, themeName, setTheme }}>
+    <ThemeContext.Provider value={{ currentTheme, themeName, setTheme, fontFamily, setFontFamily: handleFontFamilyChange }}>
       {children}
     </ThemeContext.Provider>
   );
