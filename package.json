@@ -1,7 +1,7 @@
 {
   "name": "oasis-write",
   "private": true,
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "A serene and focused markdown writing environment",
   "type": "module",
   "scripts": {

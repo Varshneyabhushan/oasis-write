@@ -4,13 +4,14 @@ Follow these steps to publish a new Oasis Write release using the GitHub Actions
 
 1) **Prereqs**
    - Ensure `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` all have the new version (semver, e.g. 0.4.0).
+   - The version change in `Cargo.toml` will automatically update `src-tauri/Cargo.lock` - include this in your commit.
    - Update `CHANGELOG.md` with the release notes.
    - Build locally if you want a sanity check: `npm run build` (Node 20+) or `npm run tauri build`.
 
 2) **Commit and Tag**
    ```bash
    git status          # clean workspace
-   git add .
+   git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock CHANGELOG.md
    git commit -m "Release vX.Y.Z"
    git tag -a vX.Y.Z -m "Release vX.Y.Z"
    git push origin master

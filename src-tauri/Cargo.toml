@@ -1,6 +1,6 @@
 [package]
 name = "oasis-write"
-version = "0.4.2"
+version = "0.4.3"
 description = "A serene and focused markdown writing environment"
 authors = ["Oasis Write Contributors"]
 edition = "2021"
