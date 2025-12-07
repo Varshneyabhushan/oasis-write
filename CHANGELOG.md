@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-12-07
+
+### Added
+- Settings dialog (Cmd/Ctrl + ,) with theme previews plus persisted theme and font-family choices.
+- Expanded theme options (Nightfall, Monokai, Dracula, Atom One Light) and refreshed Solarized palette.
+- App-wide font zoom controls (Cmd/Ctrl +/−) that resize both the sidebar and editor typography.
+
+### Changed
+- Refined welcome screen styling for a cleaner entry experience.
+
 ## [0.4.3] - 2025-12-07
 
 ### Added
