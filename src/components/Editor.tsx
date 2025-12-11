@@ -52,6 +52,7 @@ const Editor: FC<EditorProps> = ({
           fontSize={fontSize}
           onEditorReady={onEditorReady}
           onHeadingsChange={onHeadingsChange}
+          filePath={filePath}
         />
       </main>
     </div>

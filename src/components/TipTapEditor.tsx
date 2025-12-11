@@ -4,6 +4,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Typography from '@tiptap/extension-typography';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
+import type { ImageOptions } from '@tiptap/extension-image';
 import {Table} from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
@@ -16,6 +18,7 @@ import { common, createLowlight } from 'lowlight';
 import { InputRule } from '@tiptap/core';
 import { CollapsibleHeading } from '../extensions/CollapsibleHeading';
 import type { OutlineHeading } from '../types';
+import { resolveImageSrc, type ResolvedImageSrc } from '../services/ImageResolver';
 
 import './TipTapEditor.css';
 
@@ -27,9 +30,22 @@ const CustomLink = Link.extend({
     return [
       new InputRule({
         find: /\[([^\]]+)\]\(([^)]+)\)$/,
-        handler: ({ range, match, commands }) => {
+        handler: ({ range, match, commands, state }) => {
           const linkText = match[1];
           const linkUrl = match[2];
+
+          // If the pattern is preceded by '!' it's an image, so skip link handling
+          if (state && range.from > 0) {
+            const precedingChar = state.doc.textBetween(
+              Math.max(0, range.from - 1),
+              range.from,
+              '\0',
+              '\0'
+            );
+            if (precedingChar === '!') {
+              return null;
+            }
+          }
 
           if (!linkText || !linkUrl) return null;
 
@@ -147,10 +163,37 @@ interface TipTapEditorProps {
   fontSize?: number;
   onEditorReady?: (editor: Editor) => void;
   onHeadingsChange?: (headings: OutlineHeading[]) => void;
+  filePath?: string;
 }
 
-const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16, onEditorReady, onHeadingsChange }) => {
+type ImageWithResolveOptions = ImageOptions & { resolveSrc?: (src: string) => ResolvedImageSrc };
+
+const ImageWithResolvedSrc = Image.extend<ImageWithResolveOptions>({
+  addOptions() {
+    const parent = this.parent?.();
+    return {
+      inline: parent?.inline ?? false,
+      allowBase64: parent?.allowBase64 ?? false,
+      HTMLAttributes: parent?.HTMLAttributes ?? {},
+      resize: parent?.resize ?? false,
+      resolveSrc: (src: string) => ({ primary: src }),
+    };
+  },
+  renderHTML({ HTMLAttributes }) {
+    const resolved: ResolvedImageSrc = this.options.resolveSrc?.(HTMLAttributes.src) ?? { primary: HTMLAttributes.src as string };
+    const primary = resolved.primary;
+    const fallback = resolved.fallback;
+    const attrs: Record<string, any> = { ...this.options.HTMLAttributes, ...HTMLAttributes, src: primary };
+    if (fallback && fallback !== primary) {
+      attrs['data-fallback-src'] = fallback;
+    }
+    return ['img', attrs];
+  },
+});
+
+const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16, onEditorReady, onHeadingsChange, filePath }) => {
   const lastHeadingsRef = useRef<OutlineHeading[] | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   // Capture whether file was empty when first loaded (for this editor session)
   const wasInitiallyEmpty = useRef(!initialContent || initialContent.trim() === '');
 
@@ -187,6 +230,11 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
       }),
       Placeholder.configure({
         placeholder: 'Start writing... Markdown formatting is supported (headings, bold, italic, lists, and more)',
+      }),
+      ImageWithResolvedSrc.configure({
+        allowBase64: true,
+        inline: false,
+        resolveSrc: (src: string) => resolveImageSrc(src, filePath),
       }),
       Markdown.configure({
         html: false,
@@ -230,12 +278,34 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
     }
   }, [initialContent, editor, onHeadingsChange]);
 
+  // Swap to file:// fallback if asset:// load fails (some platforms block asset protocol)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleError = (event: Event) => {
+      const target = event.target as HTMLImageElement;
+      if (!target || target.tagName !== 'IMG') return;
+      const fallback = target.getAttribute('data-fallback-src');
+      if (fallback && target.src !== fallback) {
+        target.src = fallback;
+      }
+    };
+
+    container.addEventListener('error', handleError, true);
+    return () => container.removeEventListener('error', handleError, true);
+  }, []);
+
   if (!editor) {
     return null;
   }
 
   return (
-    <div className={`tiptap-container ${wasInitiallyEmpty.current ? 'empty-file' : ''}`} style={{ fontSize: `${fontSize}px` }}>
+    <div
+      ref={containerRef}
+      className={`tiptap-container ${wasInitiallyEmpty.current ? 'empty-file' : ''}`}
+      style={{ fontSize: `${fontSize}px` }}
+    >
       <EditorContent editor={editor} />
     </div>
   );
