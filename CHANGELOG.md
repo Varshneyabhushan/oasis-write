@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-12-14
+
+### Added
+- **Markdown link navigation**: Full support for internal and cross-file markdown links
+  - Same-file anchor links (`[text](#heading)`) smoothly scroll to headings within the current document
+  - Inter-file links (`[text](file.md)`) open other markdown files in the editor
+  - Cross-file anchor links (`[text](file.md#heading)`) navigate to a file and scroll to a specific section
+  - Visual validation: broken links (non-existent files or headings) are displayed with strikethrough styling
+  - All heading levels (h1-h6) are supported for anchor navigation
+  - Relative path resolution (e.g., `./file.md`, `../file.md`) follows the same pattern as image paths
+- Image preview in file explorer: thumbnails now appear next to image files in the sidebar file tree
+- Syntax highlighting for Java, Python, JavaScript, and Bash code blocks using highlight.js
+- Inline image rendering in markdown documents with support for relative paths
+
+### Changed
+- Refactored editor utilities into reusable helper functions for improved code maintainability
+- Link click handling now uses DOM event listeners for better performance and reliability
+
 ## [0.6.0] - 2025-12-07
 
 ### Added
