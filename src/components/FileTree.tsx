@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 import InlineInput from './InlineInput';
+import { hasAllowedExtension, getFileExtensionErrorMessage, isImageFile } from '../constants';
 import './FileTree.css';
 
 export interface FileEntry {
@@ -94,7 +95,8 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
   const handleClick = () => {
     if (entry.is_directory) {
       setIsExpanded(!isExpanded);
-    } else {
+    } else if (!isImageFile(entry.name)) {
+      // Only allow clicking on markdown files, not image files
       onFileSelect(entry.path);
     }
   };
@@ -145,8 +147,8 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
       return 'Name cannot start with .';
     }
 
-    if (isFile && !name.endsWith('.md') && !name.endsWith('.markdown')) {
-      return 'File must have .md or .markdown extension';
+    if (isFile && !hasAllowedExtension(name)) {
+      return getFileExtensionErrorMessage();
     }
 
     // Check if name already exists in current directory
@@ -299,7 +301,12 @@ const FileTreeItem: FC<FileTreeItemProps> = ({
             ) : (
               <span className="file-tree-spacer"></span>
             )}
-            <span className="file-tree-name" onClick={handleClick}>{entry.name}</span>
+            <span
+              className={`file-tree-name ${!entry.is_directory && isImageFile(entry.name) ? 'image-file' : ''}`}
+              onClick={handleClick}
+            >
+              {entry.name}
+            </span>
             <span className="file-tree-drag-handle" {...listeners}>
               <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
                 <circle cx="3" cy="3" r="1.5"/>
@@ -389,7 +396,7 @@ const FileTree: FC<FileTreeProps> = ({
   if (entries.length === 0) {
     return (
       <div className="file-tree-empty">
-        No markdown files found in this folder
+        No markdown or image files found in this folder
       </div>
     );
   }

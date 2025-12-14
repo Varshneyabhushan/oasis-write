@@ -4,6 +4,10 @@ use serde::{Deserialize, Serialize};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::Emitter;
 
+// Allowed file extensions for the file tree
+const ALLOWED_MARKDOWN_EXTENSIONS: &[&str] = &["md", "markdown"];
+const ALLOWED_IMAGE_EXTENSIONS: &[&str] = &["png", "jpg", "jpeg", "gif", "svg", "webp"];
+
 #[derive(Debug, Serialize, Deserialize)]
 struct FileEntry {
     name: String,
@@ -26,6 +30,17 @@ fn read_directory(path: String) -> Result<Vec<FileEntry>, String> {
     }
 
     read_dir_recursive(&dir_path)
+}
+
+// Helper function to check if a file has an allowed extension
+fn has_allowed_extension(filename: &str) -> bool {
+    if let Some(extension) = filename.rsplit('.').next() {
+        let ext_lower = extension.to_lowercase();
+        ALLOWED_MARKDOWN_EXTENSIONS.contains(&ext_lower.as_str())
+            || ALLOWED_IMAGE_EXTENSIONS.contains(&ext_lower.as_str())
+    } else {
+        false
+    }
 }
 
 fn read_dir_recursive(dir: &PathBuf) -> Result<Vec<FileEntry>, String> {
@@ -59,8 +74,8 @@ fn read_dir_recursive(dir: &PathBuf) -> Result<Vec<FileEntry>, String> {
             None
         };
 
-        // Only include markdown files and directories
-        if is_directory || name.ends_with(".md") || name.ends_with(".markdown") {
+        // Only include files with allowed extensions and directories
+        if is_directory || has_allowed_extension(&name) {
             entries.push(FileEntry {
                 name,
                 path: path_str,

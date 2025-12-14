@@ -132,7 +132,7 @@ const DroppableContent: FC<DroppableContentProps> = ({
             />
           ) : (
             <div className="placeholder">
-              No markdown files found
+              No markdown or image files found
             </div>
           )}
 

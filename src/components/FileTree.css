@@ -112,6 +112,16 @@
   cursor: pointer;
 }
 
+.file-tree-name.image-file {
+  opacity: 0.6;
+  font-style: italic;
+  cursor: default;
+}
+
+.file-tree-row:has(.file-tree-name.image-file):hover {
+  background-color: transparent;
+}
+
 .file-tree-drag-handle {
   opacity: 0;
   margin-left: auto;
