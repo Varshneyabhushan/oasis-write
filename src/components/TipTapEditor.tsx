@@ -23,6 +23,8 @@ import { InputRule } from '@tiptap/core';
 import { CollapsibleHeading } from '../extensions/CollapsibleHeading';
 import type { OutlineHeading } from '../types';
 import { resolveImageSrc, type ResolvedImageSrc } from '../services/ImageResolver';
+import { resolveMarkdownLink } from '../services/MarkdownLinkResolver';
+import { scrollToHeadingBySlug, extractHeadingSlugs, isLinkValid } from '../utils/editorHelpers';
 
 import './TipTapEditor.css';
 
@@ -34,6 +36,31 @@ lowlight.register('java', java);
 
 // Custom Link extension with markdown input rule
 const CustomLink = Link.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      'data-link-type': {
+        default: null,
+        parseHTML: element => element.getAttribute('data-link-type'),
+        renderHTML: attributes => {
+          if (!attributes['data-link-type']) {
+            return {};
+          }
+          return { 'data-link-type': attributes['data-link-type'] };
+        },
+      },
+      'data-link-valid': {
+        default: null,
+        parseHTML: element => element.getAttribute('data-link-valid'),
+        renderHTML: attributes => {
+          if (!attributes['data-link-valid']) {
+            return {};
+          }
+          return { 'data-link-valid': attributes['data-link-valid'] };
+        },
+      },
+    };
+  },
   addInputRules() {
     return [
       new InputRule({
@@ -172,6 +199,9 @@ interface TipTapEditorProps {
   onEditorReady?: (editor: Editor) => void;
   onHeadingsChange?: (headings: OutlineHeading[]) => void;
   filePath?: string;
+  onNavigateToFile?: (path: string, anchor?: string) => void;
+  files?: import('./FileTree').FileEntry[];
+  currentFilePath?: string;
 }
 
 type ImageWithResolveOptions = ImageOptions & { resolveSrc?: (src: string) => ResolvedImageSrc };
@@ -199,7 +229,17 @@ const ImageWithResolvedSrc = Image.extend<ImageWithResolveOptions>({
   },
 });
 
-const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSize = 16, onEditorReady, onHeadingsChange, filePath }) => {
+const TipTapEditor: FC<TipTapEditorProps> = ({
+  initialContent,
+  onChange,
+  fontSize = 16,
+  onEditorReady,
+  onHeadingsChange,
+  filePath,
+  onNavigateToFile,
+  files,
+  currentFilePath,
+}) => {
   const lastHeadingsRef = useRef<OutlineHeading[] | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   // Capture whether file was empty when first loaded (for this editor session)
@@ -215,7 +255,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
         levels: [1, 2, 3, 4, 5, 6],
       }),
       CustomLink.configure({
-        openOnClick: true,
+        openOnClick: false,
         autolink: true,
         linkOnPaste: true,
         HTMLAttributes: {
@@ -285,6 +325,100 @@ const TipTapEditor: FC<TipTapEditorProps> = ({ initialContent, onChange, fontSiz
       emitHeadingsIfChanged(editor, onHeadingsChange, lastHeadingsRef);
     }
   }, [initialContent, editor, onHeadingsChange]);
+
+  // Validate links and update their attributes
+  useEffect(() => {
+    if (!editor || !files || !currentFilePath) return;
+
+    const { state, view } = editor;
+    const { tr } = state;
+    let modified = false;
+
+    // Extract heading slugs from current document for anchor validation
+    const headingSlugs = extractHeadingSlugs(editor);
+
+    state.doc.descendants((node, pos) => {
+      if (node.isText && node.marks.length > 0) {
+        const linkMark = node.marks.find(mark => mark.type.name === 'link');
+        if (linkMark && linkMark.attrs.href) {
+          const href = linkMark.attrs.href;
+          const resolved = resolveMarkdownLink(href, currentFilePath, files);
+
+          const currentType = linkMark.attrs['data-link-type'];
+          const currentValid = linkMark.attrs['data-link-valid'];
+          const newType = resolved.type;
+          const newValid = isLinkValid(resolved, headingSlugs) ? 'true' : 'false';
+
+          // Only update if attributes changed
+          if (currentType !== newType || currentValid !== newValid) {
+            const newAttrs = {
+              ...linkMark.attrs,
+              'data-link-type': newType,
+              'data-link-valid': newValid,
+            };
+
+            const newMark = state.schema.marks.link.create(newAttrs);
+
+            tr.removeMark(pos, pos + node.nodeSize, linkMark.type);
+            tr.addMark(pos, pos + node.nodeSize, newMark);
+            modified = true;
+          }
+        }
+      }
+    });
+
+    if (modified) {
+      view.dispatch(tr);
+    }
+  }, [editor, files, currentFilePath]);
+
+  // Handle link clicks directly via DOM event listener
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !editor) return;
+
+    const handleLinkClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      // Check if clicked element is a link or inside a link
+      let link: HTMLAnchorElement | null = null;
+      if (target.tagName === 'A') {
+        link = target as HTMLAnchorElement;
+      } else {
+        link = target.closest('a');
+      }
+
+      if (!link) return;
+
+      const href = link.getAttribute('href');
+      if (!href) return;
+
+      // Resolve the link
+      const resolved = resolveMarkdownLink(href, currentFilePath, files);
+
+      // Handle based on link type
+      if (resolved.type === 'external') {
+        // Let browser handle external links
+        return;
+      } else if (resolved.type === 'anchor' && resolved.anchor) {
+        // Same-file anchor navigation
+        event.preventDefault();
+        event.stopPropagation();
+        scrollToHeadingBySlug(editor, resolved.anchor);
+      } else if (resolved.type === 'markdown') {
+        // Inter-file navigation
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (onNavigateToFile && resolved.targetPath) {
+          onNavigateToFile(resolved.targetPath, resolved.anchor);
+        }
+      }
+    };
+
+    container.addEventListener('click', handleLinkClick);
+    return () => container.removeEventListener('click', handleLinkClick);
+  }, [editor, currentFilePath, files, onNavigateToFile]);
 
   // Swap to file:// fallback if asset:// load fails (some platforms block asset protocol)
   useEffect(() => {

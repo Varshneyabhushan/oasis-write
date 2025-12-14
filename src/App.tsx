@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { Editor as TipTapEditorType } from "@tiptap/react";
@@ -12,6 +12,7 @@ import type { OutlineHeading, RecentItem } from "./types";
 import { useFolderWatcher } from "./hooks/useFolderWatcher";
 import { useFileHashes } from "./hooks/useFileHashes";
 import { useFileWatcher } from "./hooks/useFileWatcher";
+import { scrollToHeadingBySlug as scrollToHeadingBySlugHelper } from "./utils/editorHelpers";
 import "./App.css";
 
 const RECENT_ITEMS_STORAGE_KEY = 'oasis-write-recent-items';
@@ -95,6 +96,8 @@ function App() {
 
   const [editorInstance, setEditorInstance] = useState<TipTapEditorType | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const pendingAnchorRef = useRef<string | null>(null);
 
   const {
     bufferHashRef,
@@ -694,6 +697,46 @@ function App() {
     }
   }, [editorInstance]);
 
+  const scrollToHeadingBySlug = useCallback((slug: string) => {
+    if (!editorInstance) return;
+    scrollToHeadingBySlugHelper(editorInstance, slug);
+  }, [editorInstance]);
+
+  const handleNavigateToFile = useCallback(async (
+    targetPath: string,
+    anchor?: string
+  ) => {
+    try {
+      // Save current file if dirty
+      if (isDirty && selectedFile) {
+        await saveFile();
+      }
+
+      // Store anchor to scroll after content loads
+      if (anchor) {
+        pendingAnchorRef.current = anchor;
+      }
+
+      // Load target file
+      await loadFile(targetPath);
+      setSelectedFile(targetPath);
+    } catch (error) {
+      console.error("Failed to navigate to file:", error);
+    }
+  }, [isDirty, selectedFile, saveFile, loadFile]);
+
+  // Scroll to pending anchor after file content loads
+  useEffect(() => {
+    if (pendingAnchorRef.current && editorInstance && fileContent) {
+      // Wait for editor to render new content
+      const timer = setTimeout(() => {
+        scrollToHeadingBySlug(pendingAnchorRef.current!);
+        pendingAnchorRef.current = null;
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [fileContent, editorInstance, scrollToHeadingBySlug]);
+
   // Show welcome screen if no folder is opened
   if (!folderPath) {
     return (
@@ -739,6 +782,9 @@ function App() {
         saveStatus={saveStatus}
         onEditorReady={setEditorInstance}
         onHeadingsChange={setOutlineHeadings}
+        onNavigateToFile={handleNavigateToFile}
+        files={files}
+        currentFilePath={selectedFile || undefined}
       />
 
       <SettingsDialog isOpen={isSettingsOpen} onClose={closeSettings} />

@@ -284,6 +284,39 @@
   border-bottom-color: transparent;
 }
 
+/* Markdown file links - valid */
+.tiptap-editor a[data-link-type="markdown"][data-link-valid="true"] {
+  color: var(--link-color);
+  border-bottom: 0.0625em solid var(--link-color);
+}
+
+/* Markdown file links - broken */
+.tiptap-editor a[data-link-type="markdown"][data-link-valid="false"] {
+  color: #e53e3e;
+  text-decoration: line-through;
+  border-bottom: none;
+  opacity: 0.8;
+}
+
+/* Same-file anchor links - valid */
+.tiptap-editor a[data-link-type="anchor"][data-link-valid="true"] {
+  color: var(--link-color);
+  border-bottom: 0.0625em solid var(--link-color);
+}
+
+/* Same-file anchor links - broken */
+.tiptap-editor a[data-link-type="anchor"][data-link-valid="false"] {
+  color: #e53e3e;
+  text-decoration: line-through;
+  border-bottom: none;
+}
+
+/* External links remain with default styling */
+.tiptap-editor a[data-link-type="external"] {
+  color: var(--link-color);
+  border-bottom: 0.0625em solid var(--link-color);
+}
+
 /* Images */
 .tiptap-editor img {
   max-width: 100%;
