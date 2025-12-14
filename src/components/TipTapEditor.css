@@ -351,3 +351,62 @@
   border-top: 1px solid var(--border-color);
   margin: 32px 0;
 }
+
+/* Syntax Highlighting */
+.tiptap-editor .hljs-comment,
+.tiptap-editor .hljs-quote {
+  color: #6a737d;
+  font-style: italic;
+}
+
+.tiptap-editor .hljs-keyword,
+.tiptap-editor .hljs-selector-tag,
+.tiptap-editor .hljs-type {
+  color: #d73a49;
+}
+
+.tiptap-editor .hljs-string,
+.tiptap-editor .hljs-regexp,
+.tiptap-editor .hljs-meta .hljs-string {
+  color: #032f62;
+}
+
+.tiptap-editor .hljs-number,
+.tiptap-editor .hljs-literal,
+.tiptap-editor .hljs-boolean {
+  color: #005cc5;
+}
+
+.tiptap-editor .hljs-built_in,
+.tiptap-editor .hljs-class .hljs-title {
+  color: #6f42c1;
+}
+
+.tiptap-editor .hljs-function .hljs-title,
+.tiptap-editor .hljs-title.function_ {
+  color: #6f42c1;
+}
+
+.tiptap-editor .hljs-attr,
+.tiptap-editor .hljs-attribute,
+.tiptap-editor .hljs-variable,
+.tiptap-editor .hljs-params {
+  color: #e36209;
+}
+
+.tiptap-editor .hljs-meta {
+  color: #005cc5;
+}
+
+.tiptap-editor .hljs-tag {
+  color: #22863a;
+}
+
+.tiptap-editor .hljs-name {
+  color: #22863a;
+}
+
+.tiptap-editor .hljs-selector-id,
+.tiptap-editor .hljs-selector-class {
+  color: #6f42c1;
+}

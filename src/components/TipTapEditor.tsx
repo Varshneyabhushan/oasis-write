@@ -14,7 +14,11 @@ import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from 'tiptap-markdown';
-import { common, createLowlight } from 'lowlight';
+import { createLowlight } from 'lowlight';
+import javascript from 'highlight.js/lib/languages/javascript';
+import python from 'highlight.js/lib/languages/python';
+import bash from 'highlight.js/lib/languages/bash';
+import java from 'highlight.js/lib/languages/java';
 import { InputRule } from '@tiptap/core';
 import { CollapsibleHeading } from '../extensions/CollapsibleHeading';
 import type { OutlineHeading } from '../types';
@@ -22,7 +26,11 @@ import { resolveImageSrc, type ResolvedImageSrc } from '../services/ImageResolve
 
 import './TipTapEditor.css';
 
-const lowlight = createLowlight(common);
+const lowlight = createLowlight();
+lowlight.register('javascript', javascript);
+lowlight.register('python', python);
+lowlight.register('bash', bash);
+lowlight.register('java', java);
 
 // Custom Link extension with markdown input rule
 const CustomLink = Link.extend({
