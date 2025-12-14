@@ -294,6 +294,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
     editorProps: {
       attributes: {
         class: 'tiptap-editor',
+        spellcheck: 'false',
       },
     },
     onUpdate: ({ editor }) => {
