@@ -2,6 +2,22 @@
 
 This document contains examples of all supported markdown syntax in Oasis Write. Use this to test the live rendering capabilities of the editor.
 
+## Anchor Link Tests
+
+Test same-file navigation by clicking these links:
+
+- Jump to [Headings](#headings) section
+- Jump to [Text Formatting](#text-formatting)
+- Jump to [Code Blocks](#code-blocks)
+- Jump to [Tables (GitHub Flavored Markdown)](#tables-github-flavored-markdown)
+- Jump to [Task Lists](#task-lists)
+- Jump to [Conclusion](#conclusion)
+- Jump to [Nested Lists with Mixed Content](#nested-lists-with-mixed-content)
+- Jump to heading with numbers: [Heading 1](#heading-1)
+- This link is broken (should show as invalid): [Non-existent Section](#non-existent-section)
+
+**Inter-file navigation:** Open [LINK_TEST.md](LINK_TEST.md) to test cross-file links
+
 ## Headings
 
 # Heading 1
