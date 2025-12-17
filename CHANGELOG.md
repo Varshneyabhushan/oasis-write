@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2025-12-17
+
+### Added
+- Theme categorization in Settings dialog with automatic grouping by theme type
+- Category headers (Dark Themes, Light Themes) in theme selector dropdown
+- Scrolling support for theme dropdown menu with 300px max-height
+
+### Changed
+- Reordered themes with dark themes displayed first, followed by light themes
+- Theme type property added to Theme interface for dynamic categorization
+- Paper theme moved to light themes section
+
 ## [0.7.1] - 2025-12-15
 
 ### Added
