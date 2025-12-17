@@ -14,8 +14,8 @@ export interface Theme {
 }
 
 export const themes: Record<string, Theme> = {
-  dark: {
-    name: 'Dark',
+  midnightBlue: {
+    name: 'Midnight Blue',
     colors: {
       bgPrimary: '#181818',
       bgSecondary: '#141414',
@@ -128,4 +128,4 @@ export const themes: Record<string, Theme> = {
   },
 };
 
-export const defaultTheme = 'dark';
+export const defaultTheme = 'midnightBlue';
