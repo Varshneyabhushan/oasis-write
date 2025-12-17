@@ -14,6 +14,7 @@ export interface Theme {
 }
 
 export const themes: Record<string, Theme> = {
+  // Dark Themes
   midnightBlue: {
     name: 'Midnight Blue',
     colors: {
@@ -84,6 +85,21 @@ export const themes: Record<string, Theme> = {
       linkColor: '#8be9fd',
     },
   },
+  // Light Themes
+  paper: {
+    name: 'Paper',
+    colors: {
+      bgPrimary: '#FFFFFF',
+      bgSecondary: '#F8F8F8',
+      textPrimary: '#1A1A1A',
+      textSecondary: '#666666',
+      borderColor: '#E0E0E0',
+      headingColor: '#000000',
+      accentColor: '#4A90E2',
+      codeBg: '#F5F5F5',
+      linkColor: '#0066CC',
+    },
+  },
   atomOneLight: {
     name: 'Atom One Light',
     colors: {
@@ -110,20 +126,6 @@ export const themes: Record<string, Theme> = {
       accentColor: '#B58900',
       codeBg: '#F2EBD5',
       linkColor: '#B58900',
-    },
-  },
-  paper: {
-    name: 'Paper',
-    colors: {
-      bgPrimary: '#FFFFFF',
-      bgSecondary: '#F8F8F8',
-      textPrimary: '#1A1A1A',
-      textSecondary: '#666666',
-      borderColor: '#E0E0E0',
-      headingColor: '#000000',
-      accentColor: '#4A90E2',
-      codeBg: '#F5F5F5',
-      linkColor: '#0066CC',
     },
   },
 };
