@@ -1,5 +1,6 @@
 export interface Theme {
   name: string;
+  type: string;
   colors: {
     bgPrimary: string;
     bgSecondary: string;
@@ -17,6 +18,7 @@ export const themes: Record<string, Theme> = {
   // Dark Themes
   midnightBlue: {
     name: 'Midnight Blue',
+    type: 'dark',
     colors: {
       bgPrimary: '#181818',
       bgSecondary: '#141414',
@@ -31,6 +33,7 @@ export const themes: Record<string, Theme> = {
   },
   crimsonNoir: {
     name: 'Crimson Noir',
+    type: 'dark',
     colors: {
       bgPrimary: '#0F0F0F',
       bgSecondary: '#272727',
@@ -45,6 +48,7 @@ export const themes: Record<string, Theme> = {
   },
   nightfall: {
     name: 'Nightfall',
+    type: 'dark',
     colors: {
       bgPrimary: '#1E1E1E',
       bgSecondary: '#343434',
@@ -59,6 +63,7 @@ export const themes: Record<string, Theme> = {
   },
   monokai: {
     name: 'Monokai',
+    type: 'dark',
     colors: {
       bgPrimary: '#232323',
       bgSecondary: '#1d1d1d',
@@ -73,6 +78,7 @@ export const themes: Record<string, Theme> = {
   },
   dracula: {
     name: 'Dracula',
+    type: 'dark',
     colors: {
       bgPrimary: '#282a36',
       bgSecondary: '#1e1f29',
@@ -88,6 +94,7 @@ export const themes: Record<string, Theme> = {
   // Light Themes
   paper: {
     name: 'Paper',
+    type: 'light',
     colors: {
       bgPrimary: '#FFFFFF',
       bgSecondary: '#F8F8F8',
@@ -102,6 +109,7 @@ export const themes: Record<string, Theme> = {
   },
   atomOneLight: {
     name: 'Atom One Light',
+    type: 'light',
     colors: {
       bgPrimary: '#FAFAFA',
       bgSecondary: '#F0F0F0',
@@ -116,6 +124,7 @@ export const themes: Record<string, Theme> = {
   },
   solarizedLight: {
     name: 'Solarized',
+    type: 'light',
     colors: {
       bgPrimary: '#FDF6E3',
       bgSecondary: '#F7F0D9',

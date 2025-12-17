@@ -90,6 +90,19 @@ const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
     return themes[themeName] || themes[defaultTheme];
   }, [themeName]);
 
+  const groupedThemes = useMemo(() => {
+    const groups: Record<string, Array<[string, typeof themes[string]]>> = {};
+
+    Object.entries(themes).forEach(([key, theme]) => {
+      if (!groups[theme.type]) {
+        groups[theme.type] = [];
+      }
+      groups[theme.type].push([key, theme]);
+    });
+
+    return groups;
+  }, []);
+
   useEffect(() => {
     if (!isOpen) {
       setFontMenuOpen(false);
@@ -149,29 +162,36 @@ const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
               </button>
               {themeMenuOpen && (
                 <div className="settings-theme-menu">
-                  {Object.entries(themes).map(([key, theme]) => (
-                    <button
-                      key={key}
-                      className={`settings-theme-menu-item ${key === themeName ? 'active' : ''}`}
-                      onClick={() => {
-                        setTheme(key);
-                        setThemeMenuOpen(false);
-                      }}
-                    >
-                      <div className="settings-theme-option-body">
-                        <span
-                          className="settings-theme-sample"
-                          style={{ backgroundColor: theme.colors.bgSecondary }}
-                          aria-hidden
-                        >
-                          <span
-                            className="settings-theme-heading-bar"
-                            style={{ backgroundColor: theme.colors.headingColor }}
-                          />
-                        </span>
-                        <span className="settings-theme-option-name">{theme.name}</span>
+                  {Object.entries(groupedThemes).map(([type, themesList]) => (
+                    <div key={type}>
+                      <div className="settings-theme-category-header">
+                        {type.charAt(0).toUpperCase() + type.slice(1)} Themes
                       </div>
-                    </button>
+                      {themesList.map(([key, theme]) => (
+                        <button
+                          key={key}
+                          className={`settings-theme-menu-item ${key === themeName ? 'active' : ''}`}
+                          onClick={() => {
+                            setTheme(key);
+                            setThemeMenuOpen(false);
+                          }}
+                        >
+                          <div className="settings-theme-option-body">
+                            <span
+                              className="settings-theme-sample"
+                              style={{ backgroundColor: theme.colors.bgSecondary }}
+                              aria-hidden
+                            >
+                              <span
+                                className="settings-theme-heading-bar"
+                                style={{ backgroundColor: theme.colors.headingColor }}
+                              />
+                            </span>
+                            <span className="settings-theme-option-name">{theme.name}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   ))}
                 </div>
               )}
