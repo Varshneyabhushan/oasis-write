@@ -308,17 +308,17 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
 
   // Notify parent when editor is ready and send initial headings
   useEffect(() => {
-    if (editor && onEditorReady) {
+    if (editor && !editor.isDestroyed && onEditorReady) {
       onEditorReady(editor);
     }
-    if (editor) {
+    if (editor && !editor.isDestroyed) {
       emitHeadingsIfChanged(editor, onHeadingsChange, lastHeadingsRef);
     }
   }, [editor, onEditorReady, onHeadingsChange]);
 
   // Update content when initialContent changes (file switch)
   useEffect(() => {
-    if (editor && initialContent !== undefined) {
+    if (editor && !editor.isDestroyed && initialContent !== undefined) {
       const currentContent = getMarkdownFromEditor(editor);
       if (currentContent !== initialContent) {
         editor.commands.setContent(initialContent);
@@ -329,7 +329,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
 
   // Validate links and update their attributes
   useEffect(() => {
-    if (!editor || !files || !currentFilePath) return;
+    if (!editor || editor.isDestroyed || !files || !currentFilePath) return;
 
     const { state, view } = editor;
     const { tr } = state;
@@ -376,7 +376,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
   // Handle link clicks directly via DOM event listener
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !editor) return;
+    if (!container || !editor || editor.isDestroyed) return;
 
     const handleLinkClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -439,7 +439,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
     return () => container.removeEventListener('error', handleError, true);
   }, []);
 
-  if (!editor) {
+  if (!editor || editor.isDestroyed) {
     return null;
   }
 
