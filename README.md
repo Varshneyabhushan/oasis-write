@@ -55,16 +55,16 @@ The following features have been recently implemented:
 ## Roadmap
 
 ### Next Up
-- [ ] **Live File Watching** - Detect and reload files modified by external applications
-- [ ] **Syntax Highlighting** - Code block highlighting for multiple programming languages
-- [ ] **Table Support** - Full GitHub Flavored Markdown table editing and rendering
+- [x] **Live File Watching** - Detect and reload files modified by external applications
+- [x] **Syntax Highlighting** - Code block highlighting for multiple programming languages
+- [x] **Table Support** - Full GitHub Flavored Markdown table editing and rendering
 
 ### Core Features
 Essential features from our mission that require implementation:
 
-- [ ] **Theme System** - Light and dark theme support with theme switching
-- [ ] **Typography Customization** - Choose from curated serif and sans-serif font families
-- [ ] **Image Handling** - Display inline images from local and remote sources
+- [x] **Theme System** - Light and dark theme support with theme switching
+- [x] **Typography Customization** - Choose from curated serif and sans-serif font families
+- [x] **Image Handling** - Display inline images from local and remote sources
 
 ### Advanced Features
 Features that will enhance the writing experience:
