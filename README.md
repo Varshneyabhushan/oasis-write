@@ -2,6 +2,8 @@
 
 A serene and focused markdown writing environment.
 
+**Website**: [varshneyabhushan.github.io/oasis-write](https://varshneyabhushan.github.io/oasis-write)
+
 ## About
 
 Oasis Write is a lightweight, beautiful, and fast markdown editor built with Tauri, React, and TypeScript. It provides a distraction-free writing experience with instant markdown formatting and elegant design.
