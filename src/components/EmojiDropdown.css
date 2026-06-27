@@ -1,0 +1,83 @@
+@keyframes emojiDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-3px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.emoji-dropdown {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  width: 230px;
+  padding: 3px 0;
+  animation: emojiDropdownIn 120ms ease-out;
+}
+
+.emoji-dropdown__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 12px 5px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: var(--app-font-family);
+  font-size: 0.82rem;
+  text-align: left;
+  letter-spacing: 0.01em;
+  transition: color 80ms ease, background 80ms ease;
+}
+
+/* Left-rail cursor: the signature element */
+.emoji-dropdown__item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 0;
+  background: var(--accent-color);
+  border-radius: 0 1px 1px 0;
+  transition: height 80ms ease;
+}
+
+.emoji-dropdown__item:hover {
+  color: var(--text-primary);
+}
+
+.emoji-dropdown__item--selected {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+}
+
+.emoji-dropdown__item--selected::before {
+  height: 55%;
+}
+
+.emoji-dropdown__char {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.emoji-dropdown__name {
+  color: inherit;
+  font-size: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}

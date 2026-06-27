@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Typography from '@tiptap/extension-typography';
@@ -21,6 +21,16 @@ import bash from 'highlight.js/lib/languages/bash';
 import java from 'highlight.js/lib/languages/java';
 import { InputRule } from '@tiptap/core';
 import { CollapsibleHeading } from '../extensions/CollapsibleHeading';
+import { EmojiDropdown, type EmojiDropdownRef } from './EmojiDropdown';
+import { searchEmojis, type EmojiItem } from '../emoji';
+
+interface EmojiPopupState {
+  items: EmojiItem[];
+  from: number;
+  to: number;
+  top: number;
+  left: number;
+}
 import type { OutlineHeading } from '../types';
 import { resolveImageSrc, type ResolvedImageSrc } from '../services/ImageResolver';
 import { resolveMarkdownLink } from '../services/MarkdownLinkResolver';
@@ -242,8 +252,52 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
 }) => {
   const lastHeadingsRef = useRef<OutlineHeading[] | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  // Capture whether file was empty when first loaded (for this editor session)
   const wasInitiallyEmpty = useRef(!initialContent || initialContent.trim() === '');
+
+  const [emojiPopup, setEmojiPopup] = useState<EmojiPopupState | null>(null);
+  const emojiPopupRef = useRef<EmojiPopupState | null>(null);
+  const emojiDropdownRef = useRef<EmojiDropdownRef>(null);
+
+  // Keep ref in sync so DOM keydown handler can read it without stale closures
+  useEffect(() => {
+    emojiPopupRef.current = emojiPopup;
+  }, [emojiPopup]);
+
+  const detectEmojiTrigger = useCallback((editor: Editor) => {
+    const { selection } = editor.state;
+    if (!selection.empty) { setEmojiPopup(null); return; }
+
+    const { from } = selection;
+    const $from = editor.state.doc.resolve(from);
+    const nodeType = $from.parent.type.name;
+    if (nodeType === 'codeBlock' || nodeType === 'code') { setEmojiPopup(null); return; }
+
+    const textBefore = $from.parent.textBetween(
+      Math.max(0, $from.parentOffset - 30),
+      $from.parentOffset,
+      '\0', '\0',
+    );
+
+    const match = textBefore.match(/:(\w{1,20})$/);
+    if (!match) { setEmojiPopup(null); return; }
+
+    const items = searchEmojis(match[1]);
+    if (!items.length) { setEmojiPopup(null); return; }
+
+    const coords = editor.view.coordsAtPos(from);
+    const popupHeight = items.length * 36 + 8;
+    const top = coords.bottom + popupHeight > window.innerHeight
+      ? coords.top - popupHeight - 4
+      : coords.bottom + 4;
+
+    setEmojiPopup({
+      items,
+      from: from - match[0].length,
+      to: from,
+      top,
+      left: Math.max(8, Math.min(coords.left, window.innerWidth - 268)),
+    });
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -303,6 +357,10 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
         onChange(markdown);
       }
       emitHeadingsIfChanged(editor, onHeadingsChange, lastHeadingsRef);
+      detectEmojiTrigger(editor);
+    },
+    onSelectionUpdate: ({ editor }) => {
+      detectEmojiTrigger(editor);
     },
   });
 
@@ -315,6 +373,22 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
       emitHeadingsIfChanged(editor, onHeadingsChange, lastHeadingsRef);
     }
   }, [editor, onEditorReady, onHeadingsChange]);
+
+  // Intercept arrow/enter/escape in capture phase when emoji popup is open
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const popup = emojiPopupRef.current;
+      if (!popup) return;
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Enter' || e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        emojiDropdownRef.current?.onKeyDown({ event: e });
+        if (e.key === 'Escape') setEmojiPopup(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, []);
 
   // Update content when initialContent changes (file switch)
   useEffect(() => {
@@ -439,6 +513,17 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
     return () => container.removeEventListener('error', handleError, true);
   }, []);
 
+  const handleEmojiSelect = useCallback((item: EmojiItem) => {
+    if (!editor || !emojiPopup) return;
+    editor
+      .chain()
+      .focus()
+      .deleteRange({ from: emojiPopup.from, to: emojiPopup.to })
+      .insertContent(item.emoji)
+      .run();
+    setEmojiPopup(null);
+  }, [editor, emojiPopup]);
+
   if (!editor || editor.isDestroyed) {
     return null;
   }
@@ -450,6 +535,15 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
       style={{ fontSize: `${fontSize}px` }}
     >
       <EditorContent editor={editor} />
+      {emojiPopup && (
+        <div style={{ position: 'fixed', top: emojiPopup.top, left: emojiPopup.left, zIndex: 9999 }}>
+          <EmojiDropdown
+            ref={emojiDropdownRef}
+            items={emojiPopup.items}
+            command={handleEmojiSelect}
+          />
+        </div>
+      )}
     </div>
   );
 };
