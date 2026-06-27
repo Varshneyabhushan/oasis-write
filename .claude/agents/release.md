@@ -81,7 +81,7 @@ Tag:
 git tag -a vX.Y.Z -m "Release vX.Y.Z"
 ```
 
-Push (ask the user to confirm before pushing):
+Ask the user to confirm, then push **both** the branch and the tag — the release workflow only fires when the tag is pushed:
 ```bash
 git push origin master
 git push origin vX.Y.Z
