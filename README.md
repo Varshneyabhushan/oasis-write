@@ -31,6 +31,7 @@ Oasis Write is a lightweight, beautiful, and fast markdown editor built with Tau
 - **Works Everywhere**: Runs on macOS, Windows, and Linux
 
 For detailed features and roadmap, see [docs/FEATURES.md](docs/FEATURES.md).
+For open implementation TODOs, see [docs/TODO.md](docs/TODO.md).
 
 ## Mission
 
