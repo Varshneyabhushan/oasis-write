@@ -13,6 +13,7 @@ import { useFolderWatcher } from "./hooks/useFolderWatcher";
 import { useFileHashes } from "./hooks/useFileHashes";
 import { useFileWatcher } from "./hooks/useFileWatcher";
 import { scrollToHeadingBySlug as scrollToHeadingBySlugHelper } from "./utils/editorHelpers";
+import { FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN, FONT_SIZE_STEP } from "./constants";
 import "./App.css";
 
 const RECENT_ITEMS_STORAGE_KEY = 'oasis-write-recent-items';
@@ -82,7 +83,7 @@ function App() {
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [sidebarView, setSidebarView] = useState<SidebarView>('files');
-  const [fontSize, setFontSize] = useState(16); // Default font size in pixels
+  const [fontSize, setFontSize] = useState(FONT_SIZE_DEFAULT); // Font size in pixels
   const AUTO_SAVE_DELAY = 2000; // Auto-save after 2 seconds of inactivity
 
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
@@ -144,11 +145,11 @@ function App() {
 
   // Font size adjustment handlers
   const increaseFontSize = useCallback(() => {
-    setFontSize(prev => Math.min(prev + 2, 32)); // Max 32px
+    setFontSize(prev => Math.min(prev + FONT_SIZE_STEP, FONT_SIZE_MAX));
   }, []);
 
   const decreaseFontSize = useCallback(() => {
-    setFontSize(prev => Math.max(prev - 2, 10)); // Min 10px
+    setFontSize(prev => Math.max(prev - FONT_SIZE_STEP, FONT_SIZE_MIN));
   }, []);
 
   const openSettings = useCallback(() => {
@@ -746,7 +747,13 @@ function App() {
           recentItems={recentItems}
           onOpenRecent={handleOpenRecent}
         />
-        <SettingsDialog isOpen={isSettingsOpen} onClose={closeSettings} />
+        <SettingsDialog
+          isOpen={isSettingsOpen}
+          onClose={closeSettings}
+          fontSize={fontSize}
+          onIncreaseFontSize={increaseFontSize}
+          onDecreaseFontSize={decreaseFontSize}
+        />
       </>
     );
   }
@@ -787,7 +794,13 @@ function App() {
         currentFilePath={selectedFile || undefined}
       />
 
-      <SettingsDialog isOpen={isSettingsOpen} onClose={closeSettings} />
+      <SettingsDialog
+        isOpen={isSettingsOpen}
+        onClose={closeSettings}
+        fontSize={fontSize}
+        onIncreaseFontSize={increaseFontSize}
+        onDecreaseFontSize={decreaseFontSize}
+      />
 
       {/* Delete Confirmation Dialog */}
       {deleteConfirmation && (

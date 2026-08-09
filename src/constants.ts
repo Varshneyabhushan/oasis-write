@@ -1,3 +1,9 @@
+// Editor/UI font size bounds, shared by the keyboard shortcuts and the settings dialog
+export const FONT_SIZE_MIN = 10;
+export const FONT_SIZE_MAX = 32;
+export const FONT_SIZE_STEP = 2;
+export const FONT_SIZE_DEFAULT = 16;
+
 // Allowed file extensions for the file tree
 export const ALLOWED_MARKDOWN_EXTENSIONS = ['md', 'markdown'] as const;
 export const ALLOWED_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const;
