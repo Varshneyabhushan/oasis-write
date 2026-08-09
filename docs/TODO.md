@@ -6,7 +6,7 @@ Open implementation notes and follow-up items for Oasis Write.
 
 - [ ] Add line number display as a configurable setting.
 - [x] Make the side panel resizable.
-- [ ] Add copy buttons to code snippets.
+- [x] Add copy buttons to code snippets.
 - [ ] add status bar in the bottom 
 
 ## Markdown Editing

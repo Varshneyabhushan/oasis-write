@@ -256,6 +256,53 @@
   line-height: 1.6;
 }
 
+/* Wrapper exists so the copy button stays anchored while the code scrolls */
+.code-block-wrapper {
+  position: relative;
+}
+
+.code-block-wrapper > pre {
+  margin: 0;
+}
+
+.tiptap-editor .code-block-wrapper {
+  margin: 1.25em 0;
+}
+
+.code-copy-button {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375em;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 0.0625em solid var(--border-color);
+  border-radius: 0.25em;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.code-block-wrapper:hover .code-copy-button,
+.code-copy-button:focus-visible,
+.code-copy-button.copied {
+  opacity: 1;
+}
+
+.code-copy-button:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.code-copy-button.copied {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
 .tiptap-editor pre code {
   background: none;
   border: none;

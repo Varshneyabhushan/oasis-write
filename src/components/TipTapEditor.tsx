@@ -2,7 +2,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Typography from '@tiptap/extension-typography';
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import CodeBlockWithCopy from '../extensions/CodeBlockWithCopy';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import type { ImageOptions } from '@tiptap/extension-image';
@@ -317,7 +317,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
         },
       }),
       Typography,
-      CodeBlockLowlight.configure({
+      CodeBlockWithCopy.configure({
         lowlight,
       }),
       Table.configure({
