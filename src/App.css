@@ -8,8 +8,8 @@
 @import "@fontsource/dancing-script/700.css";
 
 :root {
-  --sidebar-width: 25rem;
-  --sidebar-effective-width: min(var(--sidebar-width), 20vw);
+  /* Overridden per-sidebar by the resize handle; see useSidebarResize */
+  --sidebar-width: 17.5rem;
   /* Theme colors are set dynamically by ThemeProvider */
   --app-font-family: Inter, "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif;
   --code-font-family: "SFMono-Regular", "JetBrains Mono", "Menlo", "Consolas", monospace;
@@ -47,20 +47,67 @@ button, input, select, textarea {
 
 /* Sidebar */
 .sidebar {
-  width: var(--sidebar-effective-width);
-  max-width: 20vw;
-  flex: 0 0 var(--sidebar-effective-width);
+  width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width);
   background-color: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease;
   flex-shrink: 0;
+  position: relative;
 }
 
 .sidebar.hidden {
   transform: translateX(-100%);
   position: absolute;
+}
+
+/* Drag strip straddling the sidebar's right border */
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -0.1875rem;
+  width: 0.375rem;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+/* Thin line centered in the wider grab strip, so the hit area stays generous */
+.sidebar-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.0625rem;
+  height: 100%;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar-resize-handle:hover::after,
+.sidebar-resize-handle:focus-visible::after,
+.sidebar-resize-handle.resizing::after {
+  background-color: var(--accent-color);
+}
+
+.sidebar-resize-handle:focus-visible {
+  outline: none;
+}
+
+.sidebar.hidden .sidebar-resize-handle {
+  display: none;
+}
+
+/* Keep the resize cursor while dragging past the handle */
+body.is-resizing,
+body.is-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
 }
 
 .sidebar-header {

@@ -4,6 +4,8 @@ import FileTree, { FileEntry } from './FileTree';
 import Outline from './Outline';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 import InlineInput from './InlineInput';
+import useSidebarResize from '../hooks/useSidebarResize';
+import { SIDEBAR_WIDTH_MIN } from '../constants';
 import type { OutlineHeading } from '../types';
 
 export type SidebarView = 'files' | 'outline';
@@ -209,6 +211,7 @@ const Sidebar: FC<SidebarProps> = ({
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [rootCreating, setRootCreating] = useState<'file' | 'folder' | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const { sidebarRef, width, isResizing, resizeHandleProps } = useSidebarResize();
 
   // Configure sensors for drag and drop
   const mouseSensor = useSensor(MouseSensor, {
@@ -377,7 +380,11 @@ const Sidebar: FC<SidebarProps> = ({
   };
 
   return (
-    <aside className={`sidebar ${!isVisible ? 'hidden' : ''}`}>
+    <aside
+      ref={sidebarRef}
+      className={`sidebar ${!isVisible ? 'hidden' : ''} ${isResizing ? 'resizing' : ''}`}
+      style={{ ['--sidebar-width' as string]: `${width}px` }}
+    >
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
@@ -448,6 +455,17 @@ const Sidebar: FC<SidebarProps> = ({
         ) : null}
       </DragOverlay>
     </DndContext>
+      <div
+        className={`sidebar-resize-handle ${isResizing ? 'resizing' : ''}`}
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize sidebar"
+        aria-valuenow={width}
+        aria-valuemin={SIDEBAR_WIDTH_MIN}
+        tabIndex={isVisible ? 0 : -1}
+        title="Drag to resize (double-click to reset)"
+        {...resizeHandleProps}
+      />
     </aside>
   );
 };

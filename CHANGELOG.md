@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2026-08-10
+
+### Added
+- Resizable side panel: drag the sidebar's right edge to set its width, double-click the handle to reset, or focus it and use the arrow keys
+- Sidebar width persists across restarts and is clamped between 180px and 640px (never more than half the window)
+
+### Changed
+- Sidebar width is no longer fixed at `min(25rem, 20vw)`
+
 ## [0.7.2] - 2025-12-17
 
 ### Added

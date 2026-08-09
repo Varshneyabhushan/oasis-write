@@ -4,6 +4,14 @@ export const FONT_SIZE_MAX = 32;
 export const FONT_SIZE_STEP = 2;
 export const FONT_SIZE_DEFAULT = 16;
 
+// Sidebar width bounds (in pixels), used by the resize handle
+export const SIDEBAR_WIDTH_MIN = 180;
+export const SIDEBAR_WIDTH_MAX = 640;
+export const SIDEBAR_WIDTH_DEFAULT = 280;
+export const SIDEBAR_WIDTH_STEP = 16;
+// The sidebar never takes more than this fraction of the window
+export const SIDEBAR_MAX_WINDOW_FRACTION = 0.5;
+
 // Allowed file extensions for the file tree
 export const ALLOWED_MARKDOWN_EXTENSIONS = ['md', 'markdown'] as const;
 export const ALLOWED_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const;
