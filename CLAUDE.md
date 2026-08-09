@@ -65,6 +65,6 @@ Only `.md`, `.markdown`, and image files (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg
 
 ### Releasing
 
-1. Update version in `package.json` and `src-tauri/tauri.conf.json`
+1. Update version in `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` (then run `cargo update -p oasis-write` to sync `Cargo.lock`)
 2. Tag and push: `git tag -a vX.Y.Z -m "Release vX.Y.Z" && git push origin vX.Y.Z`
 3. GitHub Actions builds for all platforms and attaches installers to the release
