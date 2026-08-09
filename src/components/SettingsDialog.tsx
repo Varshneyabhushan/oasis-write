@@ -33,6 +33,14 @@ const fontOptions = [
     label: 'Caveat',
     value: 'Caveat, "Segoe UI", system-ui, -apple-system, sans-serif',
   },
+  {
+    label: 'Architects Daughter',
+    value: '"Architects Daughter", "Segoe UI", system-ui, -apple-system, sans-serif',
+  },
+  {
+    label: 'Cursive',
+    value: '"Dancing Script", "Apple Chancery", "Segoe Script", cursive',
+  },
 ];
 
 const SettingsDialog: FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
