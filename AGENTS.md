@@ -65,6 +65,10 @@ Only `.md`, `.markdown`, and image files (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg
 
 ### Releasing
 
-1. Update version in `package.json` and `src-tauri/tauri.conf.json`
-2. Tag and push: `git tag -a vX.Y.Z -m "Release vX.Y.Z" && git push origin vX.Y.Z`
-3. GitHub Actions builds for all platforms and attaches installers to the release
+**Read `.claude/skills/release/SKILL.md` in full and follow it. It is the authoritative release procedure** — do not improvise from the summary below or from `RELEASE_CHECKLIST.md`. It covers version bumping, the CHANGELOG, committing, tagging, pushing, and the CI build, including the parts that are easy to get wrong.
+
+Orientation only, not instructions to follow:
+
+- The version is duplicated across five files — `package.json`, `package-lock.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock` — and all five must agree before tagging.
+- A release is a tag `vX.Y.Z` on a commit whose `package.json` already says `X.Y.Z`. CI reads the version from `package.json` at that commit, so a mismatch produces a broken release.
+- Both the branch and the tag must be pushed. Pushing the tag is what triggers `.github/workflows/release.yml`, which builds macOS/Windows/Linux and publishes the release automatically.

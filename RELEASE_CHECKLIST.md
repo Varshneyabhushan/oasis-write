@@ -1,5 +1,10 @@
 # How to Release a New Version to GitHub
 
+> **Agents: do not follow this file.** The authoritative release procedure lives
+> in `.claude/skills/release/SKILL.md` (the `release` skill). This page is a
+> human-readable summary and is deliberately shorter; where the two differ, the
+> skill is correct.
+
 Follow these steps to publish a new Oasis Write release using the GitHub Actions release workflow.
 
 1) **Prereqs**
@@ -11,7 +16,7 @@ Follow these steps to publish a new Oasis Write release using the GitHub Actions
 2) **Commit and Tag**
    ```bash
    git status          # clean workspace
-   git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock CHANGELOG.md
+   git add package.json package-lock.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock CHANGELOG.md
    git commit -m "Release vX.Y.Z"
    git tag -a vX.Y.Z -m "Release vX.Y.Z"
    git push origin master
