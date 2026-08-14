@@ -77,6 +77,12 @@ function App() {
   const [fileContent, setFileContent] = useState<string>("");
   const [originalContent, setOriginalContent] = useState<string>("");
   const [isDirty, setIsDirty] = useState(false);
+  // Set while a freshly loaded file is being handed to the editor. The editor
+  // reports its own serialization of the file, which is rarely byte-identical
+  // to what is on disk (list markers, escaping, blank lines). Treating that
+  // first report as an edit would mark the file dirty and let auto-save
+  // rewrite a file the user only ever opened — see handleContentChange.
+  const awaitingLoadEchoRef = useRef(false);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
   const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
   const [outlineHeadings, setOutlineHeadings] = useState<OutlineHeading[]>([]);
@@ -205,6 +211,7 @@ function App() {
     try {
       setOutlineHeadings([]);
       const content = await invoke<string>("read_file", { path });
+      awaitingLoadEchoRef.current = true;
       setFileContent(content);
       setOriginalContent(content);
       setSelectedFile(path);
@@ -274,6 +281,19 @@ function App() {
   const handleContentChange = (content: string) => {
     updateBufferHash(content);
     setFileContent(content);
+
+    // The first report after a load is the editor echoing the file back, not a
+    // user edit. Adopt it as the baseline so that re-serialization differences
+    // never count as unsaved changes: without this, opening a file is enough to
+    // trigger auto-save, which rewrites it in the editor's own dialect.
+    if (awaitingLoadEchoRef.current) {
+      awaitingLoadEchoRef.current = false;
+      setOriginalContent(content);
+      setIsDirty(false);
+      setSaveStatus('saved');
+      return;
+    }
+
     // Only mark as dirty if content actually changed from original
     if (content !== originalContent) {
       setIsDirty(true);
@@ -452,6 +472,11 @@ function App() {
   }, []);
 
   const handleExternalAccept = useCallback((content: string) => {
+    // Same echo as a fresh load: the editor is about to re-serialize this
+    // content and report it back. Without the flag, an external edit picked up
+    // by the watcher would bounce straight back to disk in the editor's own
+    // dialect, overwriting whatever the other program just wrote.
+    awaitingLoadEchoRef.current = true;
     setFileContent(content);
     setOriginalContent(content);
     setIsDirty(false);

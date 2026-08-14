@@ -13,7 +13,7 @@ Open implementation notes and follow-up items for Oasis Write.
 
 - [ ] Handle table insertion in markdown properly.
 - [ ] Add a read-only mode for markdown files (view without accidental edits or auto-save).
-- [ ] Support YAML front matter (like Claude Code skills) — parse, render, and edit it as a distinct block.
+- [x] Support YAML front matter (like Claude Code skills) — parse, render, and edit it as a distinct block.
 
 ## File Links & Navigation
 

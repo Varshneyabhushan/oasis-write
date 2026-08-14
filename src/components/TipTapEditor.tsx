@@ -21,6 +21,7 @@ import bash from 'highlight.js/lib/languages/bash';
 import java from 'highlight.js/lib/languages/java';
 import { InputRule } from '@tiptap/core';
 import { CollapsibleHeading } from '../extensions/CollapsibleHeading';
+import { Frontmatter } from '../extensions/Frontmatter';
 import { EmojiDropdown, type EmojiDropdownRef } from './EmojiDropdown';
 import { searchEmojis, type EmojiItem } from '../emoji';
 
@@ -308,6 +309,7 @@ const TipTapEditor: FC<TipTapEditorProps> = ({
       CollapsibleHeading.configure({
         levels: [1, 2, 3, 4, 5, 6],
       }),
+      Frontmatter,
       CustomLink.configure({
         openOnClick: false,
         autolink: true,

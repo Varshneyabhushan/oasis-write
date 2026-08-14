@@ -311,6 +311,38 @@
   color: var(--text-primary);
 }
 
+/* YAML Front Matter — document metadata, deliberately quieter than a code
+   block so it reads as a header rather than as content. */
+.tiptap-editor pre[data-frontmatter] {
+  position: relative;
+  background-color: transparent;
+  border-left: 0.1875em solid var(--border-color);
+  border-radius: 0;
+  padding: 2.25em 1.25em 0.75em;
+  margin: 0 0 1.75em;
+  font-size: 0.8125em;
+}
+
+.tiptap-editor pre[data-frontmatter]::before {
+  content: 'front matter';
+  position: absolute;
+  top: 0.85em;
+  left: 1.25em;
+  font-family: var(--app-font-family);
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.55;
+  /* Label is decoration, not document content */
+  user-select: none;
+  pointer-events: none;
+}
+
+.tiptap-editor pre[data-frontmatter] code {
+  color: var(--text-secondary);
+}
+
 /* Horizontal Rule */
 .tiptap-editor hr {
   border: none;
