@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-08-14
+
+### Added
+- YAML front matter support: a leading `---` block is parsed, rendered and edited as its own labelled block instead of being treated as a thematic break followed by a paragraph
+
+### Fixed
+- Front matter is no longer destroyed on save. Round-tripping through the editor collapsed the YAML onto one line and escaped markdown characters (`topics: [a, b]` became `topics: \[a, b\]`), which auto-save then wrote to disk
+- Opening a file no longer marks it dirty. The editor's re-serialization of a freshly loaded file was counted as an unsaved edit, so auto-save rewrote files that were only ever viewed — including files reloaded by the external-change watcher, which bounced other programs' edits back over their own writes
+
 ## [0.8.2] - 2026-08-10
 
 ### Added
